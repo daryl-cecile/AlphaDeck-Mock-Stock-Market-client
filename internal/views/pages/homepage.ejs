@@ -4,14 +4,52 @@
     <%- include('../partials/meta') %>
     <title>Dashboard - AlphaDeck</title>
     <%- include('../partials/imports') %>
-    <link rel="stylesheet" href="/public/styles/login.css">
 </head>
 <body>
 <%- include('../partials/nav') %>
 
-<main class="center shadow">
+<main class="shadow content fix-height">
 
-    <h1 class="quiet">DASHBOARD</h1>
+    <%- include('../partials/aside',{user}) %>
+
+    <section>
+        <div class="subnav">
+            <h4>My Stocks <span class="quiet" id="stock_count">0</span></h4>
+        </div>
+
+        <div class="search-list">
+            <div class="search">
+                <input type="search" name="stock-search-term" title="Filter your stocks" placeholder="Filter your stocks">
+                <%- include('../partials/search_svg') %>
+            </div>
+            <div class="result">
+
+                <div class="item">
+                    <h5>GOOG</h5>
+                    <p>Google Inc</p>
+                    <span>$146.39</span>
+                </div>
+
+                <div class="item selected">
+                    <h5>GOOG</h5>
+                    <p>Google Inc</p>
+                    <span>$146.39</span>
+                </div>
+
+                <div class="item">
+                    <h5>GOOG</h5>
+                    <p>Google Inc</p>
+                    <span>$146.39</span>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="preview center">
+            <h1 class="quiet" style="margin-bottom: 0">NOTHING TO SEE</h1>
+            <p class="quiet" style="font-size: 1rem">Select a stock on the left to preview</p>
+        </div>
+    </section>
 
 </main>
 

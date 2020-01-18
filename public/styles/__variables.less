@@ -5,7 +5,7 @@
 @title-color: #646464;
 
 @select-background: #28a7ff;
-@select-color: #EEEEEE;
+@select-color: #ffffff;
 
 @border-color: rgb(180, 180, 184);
 @light-border-color: rgb(222, 223, 227);
@@ -19,7 +19,7 @@
 @tooltip-color: rgb(216, 220, 223);
 
 @info-background-gray: rgb(245, 247, 251);
-@subnav-background: rgb(252, 251, 254);
+@subnav-background: #fbfcfe;
 
 @general-rounded-border: 3px;
 
@@ -50,4 +50,16 @@
 	-moz-transform: translate3d(0, 0, 0) @transformer;
 	-ms-transform: translate3d(0, 0, 0) @transformer;
 	transform: translate3d(0, 0, 0) @transformer;
+}
+
+.scrollGradient {
+	background:
+		linear-gradient(#ffffff 30%, rgba(255,255,255, 0)),
+		linear-gradient(rgba(255,255,255, 0), #ffffff 70%) 0 100%,
+		radial-gradient(farthest-side at 50% 0, rgba(146,146,146, 0.5), rgba(0,0,0,0)),
+		radial-gradient(farthest-side at 50% 100%, rgba(146,146,146, 0.5), rgba(0,0,0,0)) 0 100%;
+	background-color: #ffffff;
+	background-repeat: no-repeat;
+	background-attachment: local, local, scroll, scroll;
+	background-size: 100% 16px, 100% 16px, 100% 8px, 100% 8px;
 }

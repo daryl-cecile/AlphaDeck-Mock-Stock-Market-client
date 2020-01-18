@@ -8,6 +8,13 @@
   -ms-perspective: 1000;
   perspective: 1000px;
 }
+.scrollGradient {
+  background: linear-gradient(#ffffff 30%, rgba(255, 255, 255, 0)), linear-gradient(rgba(255, 255, 255, 0), #ffffff 70%) 0 100%, radial-gradient(farthest-side at 50% 0, rgba(146, 146, 146, 0.5), rgba(0, 0, 0, 0)), radial-gradient(farthest-side at 50% 100%, rgba(146, 146, 146, 0.5), rgba(0, 0, 0, 0)) 0 100%;
+  background-color: #ffffff;
+  background-repeat: no-repeat;
+  background-attachment: local, local, scroll, scroll;
+  background-size: 100% 16px, 100% 16px, 100% 8px, 100% 8px;
+}
 nav {
   display: flex;
   flex-direction: row;
@@ -16,6 +23,8 @@ nav {
   position: fixed;
   top: 0;
   width: 100vw;
+  background: white;
+  z-index: 999;
   border-bottom: 1px solid rgba(222, 223, 227, 0.2);
 }
 nav ul {
@@ -31,7 +40,7 @@ nav ul a {
   align-items: center;
   justify-content: center;
 }
-nav ul a {
+nav ul li a {
   padding: 4px 7.2px;
   font-size: 0.84rem;
   text-decoration: none;
@@ -39,19 +48,23 @@ nav ul a {
   position: relative;
   transition: all 0.4s;
 }
-nav ul a:visited {
+nav ul li a:visited {
   color: #646464;
 }
-nav ul a:hover {
+nav ul li a:hover {
   color: #28a7ff;
   opacity: 0.78;
   cursor: pointer;
 }
-nav ul a img {
+nav ul li a img {
   transition: all 1.2s;
 }
-nav ul a img:hover {
+nav ul li a img:hover {
   transform: scale(0.9);
+}
+nav ul:first-child li:not(:first-child),
+nav ul:nth-child(2) li {
+  margin-right: 0.6rem;
 }
 nav ul:first-child li:not(:first-child) a::after,
 nav ul:nth-child(2) li a::after {
@@ -83,7 +96,7 @@ nav ul:first-child li:first-child a:focus img {
   transform: scale(0.9);
   opacity: 0.5;
 }
-nav ul:nth-child(2) {
-  padding: 0 1rem;
+nav ul:first-child:not(:first-child) {
+  margin-right: 1rem;
 }
 /*# sourceMappingURL=nav.css.map */

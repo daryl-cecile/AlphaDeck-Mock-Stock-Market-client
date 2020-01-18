@@ -50,7 +50,8 @@ a{
 
 input[type="text"],
 input[type="password"],
-input[type="email"]{
+input[type="email"],
+input[type="search"]{
 	border-radius: @general-rounded-border;
 	color: @text-color;
 	border: 1px solid @light-border-color;
@@ -86,6 +87,13 @@ img{
 		padding: 3% 2.5% 3% 3.5%;
 		border-radius: 12%;
 		.smooth-shadow();
+
+		&.simple{
+			width: 4rem;
+			padding:0;
+			border-radius: 0;
+			box-shadow: none;
+		}
 	}
 
 	&.brand{

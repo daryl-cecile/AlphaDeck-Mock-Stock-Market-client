@@ -8,8 +8,18 @@
   -ms-perspective: 1000;
   perspective: 1000px;
 }
+.scrollGradient {
+  background: linear-gradient(#ffffff 30%, rgba(255, 255, 255, 0)), linear-gradient(rgba(255, 255, 255, 0), #ffffff 70%) 0 100%, radial-gradient(farthest-side at 50% 0, rgba(146, 146, 146, 0.5), rgba(0, 0, 0, 0)), radial-gradient(farthest-side at 50% 100%, rgba(146, 146, 146, 0.5), rgba(0, 0, 0, 0)) 0 100%;
+  background-color: #ffffff;
+  background-repeat: no-repeat;
+  background-attachment: local, local, scroll, scroll;
+  background-size: 100% 16px, 100% 16px, 100% 8px, 100% 8px;
+}
 main {
   min-height: 100vh;
+}
+main.fix-height {
+  height: 100vh;
 }
 main.center {
   display: flex;
@@ -19,6 +29,153 @@ main.center {
 }
 main.shadow {
   box-shadow: 0 1.5px 2.2px rgba(0, 0, 0, 0.07), 0 3.6px 5.3px rgba(0, 0, 0, 0.05), 0 6.8px 10px rgba(0, 0, 0, 0.042), 0 12.1px 17.9px rgba(0, 0, 0, 0.035), 0 22.6px 33.4px rgba(0, 0, 0, 0.028), 0 54px 80px rgba(0, 0, 0, 0.02);
+}
+main.content {
+  display: flex;
+  flex-direction: row;
+  padding-top: 58px;
+}
+aside {
+  width: 10rem;
+  font-size: 0.7rem;
+  color: #646464;
+  font-weight: 400;
+  letter-spacing: 1px;
+  border-right: 1px solid rgba(222, 223, 227, 0.5);
+  padding: 1rem 0;
+}
+aside ul {
+  list-style: none;
+  margin: 0;
+  padding: 1rem;
+}
+aside ul li {
+  margin-bottom: 1rem;
+}
+aside ul li.h {
+  text-transform: uppercase;
+  font-size: 0.62rem;
+  color: #dedfe3;
+}
+aside ul li a {
+  color: #646464;
+  text-decoration: none;
+}
+aside ul li a:visited {
+  color: #646464;
+}
+aside ul li a:hover {
+  color: #28a7ff;
+}
+aside hr {
+  border: 0 transparent;
+  border-bottom: 1px solid rgba(222, 223, 227, 0.3);
+}
+section {
+  flex: 1;
+  display: flex;
+  padding-top: 46px;
+  position: relative;
+  flex-direction: row;
+}
+section.no-padd {
+  padding-top: 0;
+}
+section.center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+section .subnav {
+  background: #fbfcfe;
+  color: #646464;
+  padding: 0.6rem 1.2rem;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  border-bottom: 1px solid rgba(222, 223, 227, 0.2);
+}
+section .subnav h4 {
+  margin: 0;
+  font-weight: 600;
+}
+section .search-list {
+  display: flex;
+  flex-direction: column;
+  width: 17.2rem;
+  border-right: 1px solid rgba(222, 223, 227, 0.2);
+}
+section .search-list .search {
+  padding: 0.4rem;
+  position: relative;
+}
+section .search-list .search input {
+  width: 100%;
+  padding-left: 26px;
+}
+section .search-list .search input:focus + svg {
+  color: #646464;
+}
+section .search-list .search input:not(:placeholder-shown) + svg {
+  color: #5f88fc;
+}
+section .search-list .search svg {
+  display: block;
+  height: 34%;
+  position: absolute;
+  top: 34%;
+  left: 14px;
+  color: #dedfe3;
+  pointer-events: none;
+}
+section .search-list .result {
+  background: linear-gradient(#ffffff 30%, rgba(255, 255, 255, 0)), linear-gradient(rgba(255, 255, 255, 0), #ffffff 70%) 0 100%, radial-gradient(farthest-side at 50% 0, rgba(146, 146, 146, 0.5), rgba(0, 0, 0, 0)), radial-gradient(farthest-side at 50% 100%, rgba(146, 146, 146, 0.5), rgba(0, 0, 0, 0)) 0 100%;
+  background-color: #ffffff;
+  background-repeat: no-repeat;
+  background-attachment: local, local, scroll, scroll;
+  background-size: 100% 16px, 100% 16px, 100% 8px, 100% 8px;
+  flex: 1;
+  overflow-y: auto;
+  max-height: calc(100% - 44px);
+}
+section .search-list .result .item {
+  position: relative;
+  padding: 15px;
+}
+section .search-list .result .item h5 {
+  margin: 0;
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+section .search-list .result .item p,
+section .search-list .result .item span {
+  margin: 0;
+  font-size: 0.7rem;
+}
+section .search-list .result .item span {
+  position: absolute;
+  right: 15px;
+  top: 15px;
+  opacity: 0.5;
+}
+section .search-list .result .item:hover {
+  background: rgba(95, 136, 252, 0.72);
+  color: #ffffff;
+}
+section .search-list .result .item.selected {
+  background: #5f88fc;
+  color: #ffffff;
+}
+section .preview {
+  flex: 1;
+}
+section .preview.center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
 }
 div.center-content {
   display: flex;
@@ -30,3 +187,4 @@ div.center-content.col,
 div.center-content .col {
   flex-direction: column;
 }
+/*# sourceMappingURL=container.css.map */

@@ -10,19 +10,35 @@
 
 <main class="center shadow">
 
-    <div class="auth-box">
+    <div class="auth-box extra-padd">
 
         <div class="center-content">
-            <img src="/public/images/logo.png" alt="logo" class="brand-img">
+            <img src="/public/images/logo.png" alt="logo" class="brand-img simple">
         </div>
 
-        <h1 class="heading">Create account</h1>
+        <h1 class="heading" style="margin-bottom: 0">Create account</h1>
+        <p class="t-mid">An AlphaDeck account will allow you to buy and share stocks</p>
 
         <br>
 
         <label class="input">
+            <span>First Name:</span>
+            <input type="text" name="firstName">
+        </label>
+
+        <label class="input">
+            <span>Last Name:</span>
+            <input type="text" name="lastName">
+        </label>
+
+        <label class="input">
             <span>Username:</span>
             <input type="text" name="username">
+        </label>
+
+        <label class="input">
+            <span>Email:</span>
+            <input type="email" name="email">
         </label>
 
         <label class="input">
@@ -36,7 +52,7 @@
 
         <br>
 
-        <p class="t-mid login-alt"><a href="/login">Log In</a></p>
+        <p class="t-mid login-alt">Already have an account? <a href="/login">Log In</a> instead.</p>
 
     </div>
 

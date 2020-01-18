@@ -8,4 +8,11 @@
   -ms-perspective: 1000;
   perspective: 1000px;
 }
+.scrollGradient {
+  background: linear-gradient(#ffffff 30%, rgba(255, 255, 255, 0)), linear-gradient(rgba(255, 255, 255, 0), #ffffff 70%) 0 100%, radial-gradient(farthest-side at 50% 0, rgba(146, 146, 146, 0.5), rgba(0, 0, 0, 0)), radial-gradient(farthest-side at 50% 100%, rgba(146, 146, 146, 0.5), rgba(0, 0, 0, 0)) 0 100%;
+  background-color: #ffffff;
+  background-repeat: no-repeat;
+  background-attachment: local, local, scroll, scroll;
+  background-size: 100% 16px, 100% 16px, 100% 8px, 100% 8px;
+}
 /*# sourceMappingURL=__variables.css.map */

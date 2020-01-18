@@ -16,5 +16,35 @@ export const HomeController = new RouterSet( (router) => {
 
     });
 
+    router.get("/account", async function(req, res, next){
+
+        let authCheck = await Passport.isAuthenticated(req, res);
+        if (authCheck.object.isSuccessful){
+            let acc = authCheck.object.payload['user'];
+            res.render("pages/account", { user: acc });
+        }
+        else{
+            res.redirect("/login");
+        }
+
+    });
+
+    router.get("/help", async function(req, res, next){
+
+        let authCheck = await Passport.isAuthenticated(req, res);
+        if (authCheck.object.isSuccessful){
+            let acc = authCheck.object.payload['user'];
+            res.render("pages/help", { user: acc });
+        }
+        else{
+            res.redirect("/login");
+        }
+
+    });
+
+    router.use(function(req, res){
+        res.render("pages/not_found");
+    });
+
     return router;
 });
