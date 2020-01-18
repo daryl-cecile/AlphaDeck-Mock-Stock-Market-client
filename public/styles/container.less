@@ -56,6 +56,9 @@ aside{
 			a{
 				color: @title-color;
 				text-decoration: none;
+				padding: 6px 10px;
+				border-radius: @general-rounded-border;
+				display: block;
 
 				&:visited{
 					color: @title-color;
@@ -63,6 +66,12 @@ aside{
 
 				&:hover{
 					color: @select-background;
+					background: @info-background-gray;
+				}
+
+				&:focus{
+					outline: none;
+					.thick-input-outline();
 				}
 			}
 
