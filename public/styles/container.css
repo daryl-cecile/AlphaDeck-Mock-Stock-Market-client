@@ -1,3 +1,6 @@
+.thick-input-outline {
+  box-shadow: 0 0 0 2px rgba(95, 136, 252, 0.84);
+}
 .gpu {
   -webkit-backface-visibility: hidden;
   -moz-backface-visibility: hidden;
@@ -35,6 +38,9 @@ main.content {
   flex-direction: row;
   padding-top: 58px;
 }
+main.padded {
+  padding: 2rem;
+}
 aside {
   width: 10rem;
   font-size: 0.7rem;
@@ -66,10 +72,6 @@ aside ul li a:visited {
 }
 aside ul li a:hover {
   color: #28a7ff;
-}
-aside hr {
-  border: 0 transparent;
-  border-bottom: 1px solid rgba(222, 223, 227, 0.3);
 }
 section {
   flex: 1;
@@ -187,4 +189,3 @@ div.center-content.col,
 div.center-content .col {
   flex-direction: column;
 }
-/*# sourceMappingURL=container.css.map */

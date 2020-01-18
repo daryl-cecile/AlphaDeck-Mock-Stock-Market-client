@@ -1,3 +1,6 @@
+.thick-input-outline {
+  box-shadow: 0 0 0 2px rgba(95, 136, 252, 0.84);
+}
 .gpu {
   -webkit-backface-visibility: hidden;
   -moz-backface-visibility: hidden;
@@ -99,4 +102,3 @@ nav ul:first-child li:first-child a:focus img {
 nav ul:first-child:not(:first-child) {
   margin-right: 1rem;
 }
-/*# sourceMappingURL=nav.css.map */

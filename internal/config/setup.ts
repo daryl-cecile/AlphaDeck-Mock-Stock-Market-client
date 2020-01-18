@@ -46,6 +46,8 @@ module.exports = {
             HomeController
         );
 
+        app.locals.System = System;
+
         server =  app.listen(PORT, () => {
             eventManager.trigger("APP_READY", PORT);
             System.log('Status',`App is running on port ${PORT}`);

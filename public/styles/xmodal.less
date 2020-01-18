@@ -1,4 +1,5 @@
 @import "__variables";
+@import "__theme";
 
 :host{
 	position: fixed;
@@ -36,10 +37,11 @@
 	p{
 		font-family: sans-serif;
 		color: @text-color;
-		letter-spacing: 1.4px;
+		letter-spacing: 1.5px;
 		line-height: 1.4;
 		font-weight: 300;
 		margin-bottom: 1.6rem;
+		font-size: 0.85rem;
 
 		@media (max-width: 500px){
 			text-align: center;
@@ -59,25 +61,14 @@
 		}
 
 		button {
-			width: 130px;
-			padding: 3px 0;
+			min-width: 130px;
 			margin-left: 15px;
-			height: 32px;
+			padding: 6px 9px;
 
-			border-radius: @general-rounded-border;
-			border: 0;
-			background: @primary-btn-color;
-			color: white;
 			font-weight: 600;
 			letter-spacing: 1.2px;
 			text-transform: uppercase;
-			.smooth-shadow();
-			transition: all .3s;
 
-			&:hover{
-				opacity: 0.8;
-				cursor: pointer;
-			}
 		}
 	}
 

@@ -1,16 +1,23 @@
 @import url('https://fonts.googleapis.com/css?family=Noto+Sans|Open+Sans:300,400,500,600,700&display=swap');
 @import "__variables";
 
+
 button{
 	background: transparent;
-	color: @border-color;
-	border: 1px solid @border-color;
+	color: @title-color;
+	border: 1px solid @title-color;
 	border-radius: @general-rounded-border;
 	padding: 6px 9px;
 	transition: all .3s;
 
 	font-size: 0.74rem;
 	font-weight: 300;
+
+	&.filled{
+		color: white;
+		background: @title-color;
+		border-color: @title-color;
+	}
 
 	&.primary{
 		color: @primary-btn-color;
@@ -20,6 +27,17 @@ button{
 			color: white;
 			background: @primary-btn-color;
 			border-color: @primary-btn-color;
+		}
+	}
+
+	&.danger{
+		color: @red;
+		border-color: @red;
+
+		&.filled{
+			color: white;
+			background: @red;
+			border-color: @red;
 		}
 	}
 
@@ -48,19 +66,77 @@ a{
 	}
 }
 
+label.input{
+	display: flex;
+	flex-direction: column;
+	margin-bottom: 1rem;
+	position: relative;
+
+	span{
+		font-size: 0.74rem;
+		font-weight: 300;
+		color: @label-color;
+		margin-bottom: 5px;
+	}
+
+	input{
+		& + i{
+			position: absolute;
+			right: .4rem;
+			top: 1.74rem;
+			font-size: 0.92em;
+			pointer-events: none;
+
+			&.fa-exclamation-triangle{
+				color: orange;
+				opacity: 0;
+				transition: all .3s;
+			}
+
+			& + .err-msg{
+				position: absolute;
+				left: calc(100% + 0.5rem);
+				top: 1.15rem;
+				font-weight: 500;
+				background: @tooltip-background;
+				color: @tooltip-color;
+				padding: 0.5rem;
+				width: fit-content;
+				border-radius: @general-rounded-border;
+				.smooth-shadow();
+				opacity: 0;
+				transition: all .3s;
+			}
+		}
+
+		&:invalid + i{
+			opacity: 1;
+		}
+
+		&:focus:invalid + i + .err-msg{
+			left: calc(100% + 1rem);
+			opacity: 1;
+		}
+	}
+}
+
 input[type="text"],
 input[type="password"],
 input[type="email"],
 input[type="search"]{
 	border-radius: @general-rounded-border;
 	color: @text-color;
-	border: 1px solid @light-border-color;
+	border: 2px solid @light-border-color;
 	padding: 6px 7.2px;
 	font-size: 0.72rem;
 
+	&:invalid{
+		border: 2px solid @red;
+	}
+
 	&:focus{
 		outline:none;
-		box-shadow: 0 0 0 3px @primary-btn-color-faint;
+		border: 2px solid @primary-btn-color-faint;
 	}
 
 }
@@ -103,4 +179,22 @@ img{
 
 .quiet{
 	color: rgba(0,0,0,0.2);
+}
+
+.muted{
+	color: rgba(0,0,0,0.5);
+}
+
+hr{
+	border: 0 transparent;
+	border-bottom: 1px solid rgba(@light-border-color, 0.3);
+	width: 100%;
+
+	&.mini{
+		width: 80%
+	}
+
+	&.push{
+		margin: 2.46rem 1.2rem;
+	}
 }

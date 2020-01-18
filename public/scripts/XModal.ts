@@ -72,11 +72,11 @@ class XModal extends HTMLElement{
         this._title = this._title + "";
         switch (buttonType) {
             case XModalButtonType.PRIMARY:
-                return "button-primary";
+                return "primary filled";
             case XModalButtonType.DANGER:
-                return "button-negative";
+                return "danger filled";
             case XModalButtonType.CANCEL:
-                return "button-default";
+                return "";
         }
     }
 

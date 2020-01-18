@@ -26,6 +26,17 @@ class repo extends BaseRepository<UserModel>{
 
     }
 
+    async getByUsernameOrEmail(usernameOrEmail:string){
+
+        return await this.repo.findOne({
+            where : [
+                {username: usernameOrEmail},
+                {email: usernameOrEmail}
+            ]
+        });
+
+    }
+
 }
 
 export const UserRepository = new repo();

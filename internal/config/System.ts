@@ -3,9 +3,7 @@ import {SystemLogRepository} from "../Repository/SystemLogRepository";
 import {XError} from "./XError";
 import {CookieStore} from "./CookieHelper";
 import {dbConnector as db} from "./DBConnection";
-import * as e from "express";
 import * as core from "express-serve-static-core";
-import {Router} from "express";
 import {RouterSet} from "./RouterSet";
 
 const eventManager = require('./GlobalEvents');
@@ -17,9 +15,18 @@ export namespace System{
     let isProd:boolean = null;
     let ignoreOutput:boolean = false;
 
+    export let rootPath:string = "";
+
     export let cookieStore:CookieStore;
+    export let Cache = {};
 
     export const InstanceId = require("crypto").randomBytes(12).toString('hex');
+
+    type SystemBuildInfo = {
+        last_build:string,
+        last_hash:string,
+        version:string
+    };
 
     export function isProduction(){
         // check if .env file exists; if so, we are running dev mode, otherwise prod
@@ -208,6 +215,22 @@ export namespace System{
         };
 
         return loaders;
+    }
+
+    export function getBuildInfo():SystemBuildInfo{
+        if (System.Cache['buildInfo']){
+            return System.Cache['buildInfo'];
+        }
+
+        let path = require("path");
+        let fs = require("fs");
+
+        let c = fs.readFileSync( path.join(System.rootPath,"public/build_info.json") , "utf-8" );
+        let r = JSON.parse(c);
+
+        System.Cache['buildInfo'] = r;
+
+        return r;
     }
 
     export namespace Middlewares{

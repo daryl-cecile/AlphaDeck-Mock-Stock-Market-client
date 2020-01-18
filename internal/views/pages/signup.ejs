@@ -33,17 +33,20 @@
 
         <label class="input">
             <span>Username:</span>
-            <input type="text" name="username">
+            <input type="text" name="username" minlength="4">
+            <i class="fas fa-exclamation-triangle"></i> <span class="err-msg">Username length must be more than 3</span>
         </label>
 
         <label class="input">
             <span>Email:</span>
             <input type="email" name="email">
+            <i class="fas fa-exclamation-triangle"></i>
         </label>
 
         <label class="input">
             <span>Password:</span>
-            <input type="password" name="password">
+            <input type="password" name="password" minlength="6">
+            <i class="fas fa-exclamation-triangle"></i> <span class="err-msg">Password length must be more than 5</span>
         </label>
 
         <br>
@@ -61,28 +64,67 @@
 <script>
     function signup(btn){
         let btnState = Tools.ButtonStateSwapper(btn);
+        let formInvalid = false;
         btnState.setLoading();
 
-        let uid = $('[name="username"]').get(0);
-        let pwd = $('[name="password"]').get(0);
-
-        $.post("/api/do-signup",{
-            username : uid.value,
-            password : pwd.value,
+        let requestObject = {
             CSRF_Token : Tools.csrfToken()
-        }, res => {
+        };
+
+        $('label.input input').toArray().reduce(function(result, item) {
+            result[item.name] = item.value;
+            if (item.validity.valid === false) formInvalid = true;
+            return result;
+        }, requestObject);
+
+        if (formInvalid){
+            btnState.reset();
+            return;
+        }
+
+        $.post("/api/do-signup", requestObject , res => {
             btnState.reset();
             if (res.isSuccessful){
-                location.href = "/";
-            }
-            else{
-                let modal = new XModal(res.message, res.title, XModalType.ALERT);
+
+                let modal = new XModal(res.message, res.title, XModalType.INFORMATION);
                 modal.open({
                     okayBtn : {
-                        text : "Okay",
-                        type: XModalButtonType.PRIMARY
+                        text : "Go to Sign in",
+                        type: XModalButtonType.PRIMARY,
+                        callback : ()=>{
+                            location.href = "/";
+                        }
                     }
                 });
+
+            }
+            else{
+                let kind = res.payload.kind;
+                let modal = new XModal(res.message, res.title, XModalType.ALERT);
+
+                if (kind === "UAEXISTS"){
+                    modal.open({
+                        okayBtn : {
+                            text : "Try again",
+                            type: XModalButtonType.CANCEL
+                        },
+                        signInBtn : {
+                            text : "Log in instead",
+                            type : XModalButtonType.PRIMARY,
+                            callback : ()=>{
+                                location.href = "/login"
+                            }
+                        }
+                    });
+                }
+                else{
+                    modal.open({
+                        okayBtn : {
+                            text : "Okay",
+                            type: XModalButtonType.PRIMARY
+                        }
+                    });
+                }
             }
         });
 

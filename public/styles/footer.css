@@ -1,3 +1,6 @@
+.thick-input-outline {
+  box-shadow: 0 0 0 2px rgba(95, 136, 252, 0.84);
+}
 .gpu {
   -webkit-backface-visibility: hidden;
   -moz-backface-visibility: hidden;
@@ -43,4 +46,3 @@ footer:hover span:nth-child(2) {
 footer a {
   text-decoration: none;
 }
-/*# sourceMappingURL=footer.css.map */

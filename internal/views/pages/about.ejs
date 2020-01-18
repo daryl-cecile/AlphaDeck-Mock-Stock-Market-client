@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <%- include('../partials/meta') %>
+    <title>About AlphaDeck</title>
+    <%- include('../partials/imports') %>
+</head>
+<body>
+<%- include('../partials/nav') %>
+
+<main class="center shadow padded">
+
+    <h1 class="quiet" style="margin-bottom: 0">About AlphaDeck</h1>
+    <p class="muted t-mid" style="font-size: 1rem; max-width: 80%">
+        This project, its theme, and content were designed and implemented by
+        <a href="https://darylcecile.net" target="_blank">Daryl Cecile</a>, and can be found on the
+        <a target="_blank" rel="noopener" href="https://github.com/daryl-cecile/Service-Centric-And-Cloud-computing">project repository</a>
+        on GitHub. All Stock and shares information was provided by <a href="//alphavantage.co" rel="noopener">AlphaVantage</a>.
+    </p>
+
+    <hr class="mini push">
+
+    <p class="quiet t-mid">
+        Version: <%= System.getBuildInfo().version %> <br>
+        Build: <%= System.getBuildInfo().last_hash %>
+    </p>
+
+</main>
+
+<%- include('../partials/footer') %>
+</body>
+</html>
