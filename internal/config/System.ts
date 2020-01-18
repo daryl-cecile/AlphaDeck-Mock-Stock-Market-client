@@ -30,7 +30,7 @@ export namespace System{
 
     export function isProduction(){
         // check if .env file exists; if so, we are running dev mode, otherwise prod
-        if (isProd === null) isProd = (require("fs").existsSync( require("path").resolve("./.env") ) === false);
+        if (isProd === null) isProd = (process.env?.CI == "true");
         return isProd;
     }
 
