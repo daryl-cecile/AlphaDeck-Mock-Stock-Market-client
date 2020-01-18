@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <%- include('../partials/meta') %>
+    <title>Log In - AlphaDeck</title>
+    <%- include('../partials/imports') %>
+    <link rel="stylesheet" href="/public/styles/login.css">
+</head>
+<body>
+
+<main class="center shadow">
+
+    <div class="auth-box">
+
+        <div class="center-content">
+            <img src="/public/images/logo.png" alt="logo" class="brand-img">
+        </div>
+
+        <h1 class="heading">Log In</h1>
+
+        <br>
+
+        <label class="input">
+            <span>Username:</span>
+            <input type="text" name="username">
+        </label>
+
+        <label class="input">
+            <span>Password:</span>
+            <input type="password" name="password">
+        </label>
+
+        <br>
+
+        <button class="primary filled" onclick="login(this)">Continue</button>
+
+        <br>
+
+        <p class="t-mid login-alt"><a href="/signup">Create account</a></p>
+
+    </div>
+
+</main>
+
+    <script>
+        function login(btn){
+            let btnState = Tools.ButtonStateSwapper(btn);
+            btnState.setLoading();
+
+            let uid = $('[name="username"]').get(0);
+            let pwd = $('[name="password"]').get(0);
+
+            $.post("/api/do-login",{
+                username : uid.value,
+                password : pwd.value,
+                CSRF_Token : Tools.csrfToken()
+            }, res => {
+                btnState.reset();
+                if (res.isSuccessful){
+                    location.href = "/";
+                }
+                else{
+                    let modal = new XModal(res.message, res.title, XModalType.ALERT);
+                    modal.open({
+                        okayBtn : {
+                            text : "Okay",
+                            type: XModalButtonType.PRIMARY
+                        }
+                    });
+                }
+            });
+
+        }
+    </script>
+
+    <%- include('../partials/footer') %>
+</body>
+</html>

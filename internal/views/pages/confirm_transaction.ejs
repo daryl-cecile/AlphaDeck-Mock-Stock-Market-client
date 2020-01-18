@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <%- include('../partials/meta') %>
+    <title>Confirm</title>
+    <%- include('../partials/imports') %>
+    <link rel="stylesheet" href="/public/styles/confirm.css">
+</head>
+<body>
+    <%- include('../partials/nav', {isAdmin:true}) %>
+
+    <h1>Confirm</h1>
+
+    <div class="main-contain">
+        <div class="confirm-message">
+            <h3>Thank you!</h3>
+            Here is what you've checked out
+        </div>
+        <div class="confirm-summary">
+            <div class="checkout-item" id="item1">Whiteboard Pens 2 Pack (Blue and Black)</div>
+            <div class="checkout-item" id="item2">Blu-tack</div>
+            <div class="checkout-item" id="item3"></div>
+        </div>
+        <div class="confirm-buttons">
+            <button class="button-primary">Finish and Sign Out!</button>
+            <a href="/">cancel transaction</a>
+        </div>
+    </div>
+
+    <%- include('../partials/footer') %>
+
+</body>
+</html>

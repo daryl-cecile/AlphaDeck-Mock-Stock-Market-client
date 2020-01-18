@@ -1,0 +1,32 @@
+.gpu {
+  -webkit-backface-visibility: hidden;
+  -moz-backface-visibility: hidden;
+  -ms-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-perspective: 1000px;
+  -moz-perspective: 1000px;
+  -ms-perspective: 1000;
+  perspective: 1000px;
+}
+main {
+  min-height: 100vh;
+}
+main.center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+main.shadow {
+  box-shadow: 0 1.5px 2.2px rgba(0, 0, 0, 0.07), 0 3.6px 5.3px rgba(0, 0, 0, 0.05), 0 6.8px 10px rgba(0, 0, 0, 0.042), 0 12.1px 17.9px rgba(0, 0, 0, 0.035), 0 22.6px 33.4px rgba(0, 0, 0, 0.028), 0 54px 80px rgba(0, 0, 0, 0.02);
+}
+div.center-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+}
+div.center-content.col,
+div.center-content .col {
+  flex-direction: column;
+}

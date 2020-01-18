@@ -1,0 +1,98 @@
+@import url('https://fonts.googleapis.com/css?family=Noto+Sans|Open+Sans:300,400,500,600,700&display=swap');
+@import "__variables";
+
+button{
+	background: transparent;
+	color: @border-color;
+	border: 1px solid @border-color;
+	border-radius: @general-rounded-border;
+	padding: 6px 9px;
+	transition: all .3s;
+
+	font-size: 0.74rem;
+	font-weight: 300;
+
+	&.primary{
+		color: @primary-btn-color;
+		border-color: @primary-btn-color;
+
+		&.filled{
+			color: white;
+			background: @primary-btn-color;
+			border-color: @primary-btn-color;
+		}
+	}
+
+	&.auto-mid{
+		margin: 8px auto 5px;
+		max-width: 12rem;
+	}
+
+	&:focus{
+		outline: none;
+		opacity: 0.85;
+	}
+
+	&:hover{
+		opacity: 0.7;
+		cursor: pointer;
+	}
+}
+
+a{
+	color: @primary-btn-color;
+
+	&:visited,
+	&:hover{
+		color: @select-background;
+	}
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"]{
+	border-radius: @general-rounded-border;
+	color: @text-color;
+	border: 1px solid @light-border-color;
+	padding: 6px 7.2px;
+	font-size: 0.72rem;
+
+	&:focus{
+		outline:none;
+		box-shadow: 0 0 0 3px @primary-btn-color-faint;
+	}
+
+}
+
+span{
+	&.hint{
+		font-style: italic;
+		color: @border-color;
+		font-size: 0.6rem;
+	}
+}
+
+p{
+	font-size: 0.6rem;
+}
+
+.t-mid{
+	text-align: center;
+}
+
+img{
+	&.brand-img{
+		width: 6.5rem;
+		padding: 3% 2.5% 3% 3.5%;
+		border-radius: 12%;
+		.smooth-shadow();
+	}
+
+	&.brand{
+		height: 2.8rem;
+	}
+}
+
+.quiet{
+	color: rgba(0,0,0,0.2);
+}

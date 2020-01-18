@@ -1,0 +1,38 @@
+.gpu {
+  -webkit-backface-visibility: hidden;
+  -moz-backface-visibility: hidden;
+  -ms-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-perspective: 1000px;
+  -moz-perspective: 1000px;
+  -ms-perspective: 1000;
+  perspective: 1000px;
+}
+footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 12rem;
+  background: #323232;
+  color: #646464;
+  z-index: -1;
+}
+footer span {
+  transition: all 0.4s;
+}
+footer span:first-child {
+  margin-bottom: 5px;
+}
+footer span:nth-child(2) {
+  opacity: 0.6;
+}
+footer:hover span:first-child {
+  color: white;
+}
+footer:hover span:nth-child(2) {
+  opacity: 1;
+}
+footer a {
+  text-decoration: none;
+}
