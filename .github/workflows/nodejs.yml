@@ -28,3 +28,4 @@ jobs:
         SQL_USER: ${{ secrets.SQL_USER }}
         SQL_PASS: ${{ secrets.SQL_PASS }}
         SQL_BASE: ${{ secrets.SQL_BASE }}
+        ALPHA_VANTAGE_API: ${{ secrets.ALPHA_VANTAGE_API }}
