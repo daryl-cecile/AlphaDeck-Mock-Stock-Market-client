@@ -2,7 +2,7 @@ import {BeforeInsert, Column, Entity} from "typeorm";
 import {BaseModel} from "./IModel";
 
 
-@Entity("work-log")
+@Entity("work_log")
 export class SystemLogEntryModel extends BaseModel{
 
     @Column("varchar",{length: 255, nullable: true})
@@ -18,6 +18,9 @@ export class SystemLogEntryModel extends BaseModel{
     private setExpiry(){
         this.expiry = new Date( Date.now() + 30 * 60_000 );
     }
+
+    @Column("text",{ nullable : true })
+    public extraInfo:string;
 
     @Column("varchar")
     public reference:string;

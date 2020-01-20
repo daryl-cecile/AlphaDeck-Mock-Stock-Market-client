@@ -1,3 +1,5 @@
+import {isNullOrUndefined} from "./convenienceHelpers";
+
 class XStackFrame{
 
     public functionName:string;
@@ -61,11 +63,13 @@ export class XError{
         this.originalError = error;
 
         let details = [];
-        let stacks = error.stack.toString().split(/\r\n|\n/);
+        let stacks = error.stack?.toString()?.split(/\r\n|\n/);
 
-        if (stacks[0].indexOf("Error:") === -1){
+        if ( isNullOrUndefined(stacks) ) stacks = [""];
+
+        if (stacks[0]?.indexOf("Error:") === -1){
             let line = stacks[0];
-            while (line.indexOf("Error:") === -1){
+            while ((line||"").indexOf("Error:") === -1){
                 details.push( stacks.shift() );
                 line = stacks[0];
             }
@@ -73,8 +77,8 @@ export class XError{
 
         this.details = details.join("\n");
 
-        this.type = stacks[0].split(":")[0];
-        this.message = stacks[0].split(": ")[1];
+        this.type = stacks[0].split(":")?.[0];
+        this.message = stacks[0].split(": ")?.[1];
 
         stacks.shift(); // remove first
 

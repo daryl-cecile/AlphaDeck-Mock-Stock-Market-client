@@ -7,7 +7,7 @@ export enum TransactionType{
     BUY
 }
 
-@Entity("transaction-log")
+@Entity("transaction_log")
 export class TransactionLogModel extends BaseModel{
 
     @Column("integer",{nullable: false})

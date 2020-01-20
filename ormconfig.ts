@@ -4,6 +4,8 @@ import {ShareModel} from "./internal/models/ShareModel";
 import {SessionModel} from "./internal/models/SessionModel";
 import {SystemLogEntryModel} from "./internal/models/SystemLogEntryModel";
 import {TransactionLogModel} from "./internal/models/TransactionLogModel";
+import {ApiCacheModel} from "./internal/models/ApiCacheModel";
+import {OptionModel} from "./internal/models/OptionModel";
 
 interface IConnectionInfo{
     type: string,
@@ -40,7 +42,9 @@ let x:IConnectionInfo = {
         ShareModel,
         SessionModel,
         SystemLogEntryModel,
-        TransactionLogModel
+        TransactionLogModel,
+        ApiCacheModel,
+        OptionModel
     ],
     migrationsTableName:'db_migrations',
     migrations: ["orm_migrations/*.js"],

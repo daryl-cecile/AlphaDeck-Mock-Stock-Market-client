@@ -36,6 +36,10 @@ export namespace System{
 
     export enum ERRORS{
         UNKNOWN = 0x99,
+        SEED_ERROR = 0x09,
+        STATUS_CHANGE = 0x08,
+        NETWORK_RESULT_ERR = 0x07,
+        PROMISE_ERR = 0x06,
         CALLBACK_ERR = 0x05,
         SIGNAL_ERR = 0x03,
         DB_BOOT = 0x02,
@@ -51,15 +55,24 @@ export namespace System{
 
     export async function error(err:Error,errcode?:System.ERRORS,extraInfo?:string){
         let e = XError.createFrom(err);
-        let rSF = e.stackFrames[0];
+        let rSF = e.stackFrames?.[0] || {
+            fileName:"<unknown>",
+            lineNumber:"-1",
+            columnNumber:"-800"
+        };
         let message = e.message;
 
-        if (extraInfo) message += "\n\n\t" + extraInfo;
+        let xs = (err || err.stack).toString() + "\n\n\n";
 
-        await System.log(e.type, `${rSF.fileName}:${rSF.lineNumber}:${rSF.columnNumber}\n\t${message}`, errcode);
+        if (extraInfo) {
+            message += "\n\n\t" + extraInfo;
+            xs += extraInfo;
+        }
+
+        await System.log(e.type, `${rSF.fileName}:${rSF.lineNumber}:${rSF.columnNumber}\n\t${message}`, errcode, xs);
     }
 
-    export async function log(title:string, message:string, errCode?:System.ERRORS){
+    export async function log(title:string, message:string, errCode?:System.ERRORS, extras:string=""){
 
         if (ignoreOutput) return;
 
@@ -72,6 +85,7 @@ export namespace System{
             entry.message = message;
             entry.errorCode = err_code_normalized;
             entry.reference = System.InstanceId;
+            entry.extraInfo = extras;
 
             if ( backlog.length > 0 || SystemLogRepository.isConnectionReady() === false ){
                 pushToBacklog(entry);
@@ -159,8 +173,14 @@ export namespace System{
 
     export function attachTerminateListeners(server){
 
+        process.on('unhandledRejection', (reason, p) => {
+            if (reason && reason['stack']){
+                System.error(<any>reason, ERRORS.PROMISE_ERR, reason['stack']);
+            }
+        });
+
         // catch app level errors in case
-        process.on("uncaughtException",err => {
+        process.on("uncaughtException",(err) => {
             System.fatal(err, System.ERRORS.APP_BOOT,"uncaughtException");
         });
 
