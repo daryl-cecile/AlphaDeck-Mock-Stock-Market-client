@@ -24,8 +24,10 @@ jobs:
         npm test
       env:
         CI: true
+        PROD: false  
         SQL_IP: ${{ secrets.SQL_IP }}
         SQL_USER: ${{ secrets.SQL_USER }}
         SQL_PASS: ${{ secrets.SQL_PASS }}
         SQL_BASE: ${{ secrets.SQL_BASE }}
         ALPHA_VANTAGE_API: ${{ secrets.ALPHA_VANTAGE_API }}
+        OPEN_EXCHANGE_RATE_API: ${{ secrets.OPEN_EXCHANGE_RATE_API }}
