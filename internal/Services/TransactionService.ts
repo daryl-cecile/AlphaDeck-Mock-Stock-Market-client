@@ -14,7 +14,7 @@ class service extends BaseService{
 
     async processPurchase(buyer:UserModel, stock:StockModel, quantity:number=1){
         if (quantity > 0){
-            let nativeCost = (await ForexService.convert(stock.currency,buyer.creditCurrency, stock.price));
+            let nativeCost = (await ForexService.convert(stock.currency,buyer.creditCurrency, stock.price * quantity));
 
             if (nativeCost > buyer.credit) throw new AppError("Transaction failed due to insufficient funds");
 
@@ -43,7 +43,7 @@ class service extends BaseService{
     }
 
     async processSale(seller:UserModel, share:ShareModel){
-        let worth = (await ForexService.convert(share.currency, seller.creditCurrency, share.stockInfo.price));
+        let worth = (await ForexService.convert(share.currency, seller.creditCurrency, share.stockInfo.price * share.quantity));
 
         let log = new TransactionLogModel();
         log.atPrice = share.boughtAtPrice;

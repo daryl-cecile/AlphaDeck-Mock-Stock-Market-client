@@ -27,7 +27,6 @@ export class StockModel extends BaseModel{
     public currency:string;
 
     @OneToMany(type => ShareModel, share => share.stockInfo)
-    @JoinTable()
     @jsonIgnore()
     public soldShares:ShareModel[];
 

@@ -31,7 +31,7 @@ class repo extends BaseRepository<OptionModel>{
     async setOption(properties:ObjectProperties<OptionModel>, autoSave:boolean=true){
         let option = new OptionModel();
 
-        if (autoSave === true && await this.hasOption( properties.label )) {
+        if (autoSave === true && await this.hasOption( properties.label , false )) {
             let o = await this.getOption( properties.label , false );
             if ( !isNullOrUndefined(o) ) {
                 loadProperties(o,properties);

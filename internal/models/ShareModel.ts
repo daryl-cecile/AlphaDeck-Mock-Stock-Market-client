@@ -1,4 +1,4 @@
-import {Column, Entity, JoinColumn, ManyToOne} from "typeorm";
+import {Column, Entity, JoinColumn, JoinTable, ManyToOne} from "typeorm";
 import {BaseModel} from "./IModel";
 import {StockModel} from "./StockModel";
 import {UserModel} from "./UserModel";
@@ -20,6 +20,7 @@ export class ShareModel extends BaseModel{
     public owner:UserModel;
 
     @ManyToOne(type => StockModel, stock => stock.soldShares)
+    @JoinTable()
     public stockInfo:StockModel;
 
 }
