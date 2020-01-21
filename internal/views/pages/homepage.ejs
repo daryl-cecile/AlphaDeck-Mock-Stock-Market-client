@@ -14,7 +14,7 @@
 
     <section>
         <div class="subnav">
-            <h4>My Stocks <span class="quiet" id="stock_count">0</span></h4>
+            <h4>My Stocks <span class="quiet" id="stock_count"><%=shares.length%></span></h4>
         </div>
 
         <div class="search-list">
@@ -32,12 +32,6 @@
                     </div>
                 <% } %>
 
-<!--                <div class="item selected">-->
-<!--                    <h5>GOOG</h5>-->
-<!--                    <p>Google Inc</p>-->
-<!--                    <span>$146.39</span>-->
-<!--                </div>-->
-
             </div>
         </div>
 
@@ -48,6 +42,17 @@
     </section>
 
 </main>
+
+<script>
+    Tools.onReady(()=>{
+        let $col = $('.result .item');
+
+        $col.on('click',function(){
+            $col.removeClass("selected");
+            $(this).addClass("selected");
+        });
+    })
+</script>
 
 <%- include('../partials/footer') %>
 </body>
