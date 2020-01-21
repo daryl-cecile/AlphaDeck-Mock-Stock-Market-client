@@ -8,7 +8,7 @@ export class SystemLogEntryModel extends BaseModel{
     @Column("varchar",{length: 255, nullable: true})
     public title:string;
 
-    @Column("varchar", {length: 255})
+    @Column("text")
     public message:string;
 
     @Column("varchar",{length:12, nullable: true, name:'err-code'})

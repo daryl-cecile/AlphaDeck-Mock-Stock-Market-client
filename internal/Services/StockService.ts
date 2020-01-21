@@ -333,9 +333,9 @@ class service extends BaseService{
 
     // ALPHADECK
 
-    public async getStock(symbol:string);
-    public async getStock(symbol:string, companyName:string, currency:string);
-    public async getStock(symbol:string, companyName?:string, currency?:string){
+    public async getStock(symbol:string):Promise<StockModel>;
+    public async getStock(symbol:string, companyName:string, currency:string):Promise<StockModel>;
+    public async getStock(symbol:string, companyName?:string, currency?:string):Promise<StockModel>{
         await System.log("Task",`getStock - symb: ${symbol}, cpN: ${companyName}, cny: ${currency}`);
         let extraInfo = await StockService.getStockInfo(symbol, true);
 

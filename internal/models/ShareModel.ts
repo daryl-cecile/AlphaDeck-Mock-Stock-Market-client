@@ -15,11 +15,11 @@ export class ShareModel extends BaseModel{
     @Column("decimal", { precision: 16, scale: 4 })
     public boughtAtPrice:number;
 
-    @ManyToOne(type => StockModel, stock => stock.soldShares)
-    public stockInfo:StockModel;
-
     @ManyToOne(type => UserModel, user => user.ownedShares)
     @JoinColumn()
     public owner:UserModel;
+
+    @ManyToOne(type => StockModel, stock => stock.soldShares)
+    public stockInfo:StockModel;
 
 }

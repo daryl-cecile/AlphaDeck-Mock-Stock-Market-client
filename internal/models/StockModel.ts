@@ -11,7 +11,7 @@ export class StockModel extends BaseModel{
     @Column("varchar",{ length: 255 })
     public company:string;
 
-    @Column("decimal", { precision: 16, scale: 4 })
+    @Column("decimal",{ precision: 16, scale: 4 })
     public price:number;
 
     @Column("integer")

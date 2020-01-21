@@ -13,7 +13,8 @@ class repo extends BaseRepository<UserModel>{
             where : [
                 {username: usernameOrEmail},
                 {email: usernameOrEmail}
-            ]
+            ],
+            relations : ['ownedShares','transactions']
         });
 
     }
@@ -21,7 +22,8 @@ class repo extends BaseRepository<UserModel>{
     async getByUsername(username:string){
 
         return await this.repo.findOne({
-            where : {username: username}
+            where : {username: username},
+            relations : ['ownedShares','transactions']
         });
 
     }
@@ -32,7 +34,8 @@ class repo extends BaseRepository<UserModel>{
             where : [
                 {username: usernameOrEmail},
                 {email: usernameOrEmail}
-            ]
+            ],
+            relations : ['ownedShares','transactions']
         });
 
     }
