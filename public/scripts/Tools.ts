@@ -60,6 +60,32 @@ namespace Tools{
         return getCookie("_csrf");
     }
 
+    export function showLoading(){
+        let id = "loading-fence";
+        let l = {
+            stop : ()=>{
+                let wall = $('#'+id).removeClass('built');
+                setTimeout(()=>{
+                    wall.remove();
+                },300);
+                return l;
+            },
+            start : ()=>{
+                let wall = $(`<div class="wall" id="${id}"> <i class="fas fa-spinner fa-pulse"></i> <h5>This may take up to a minute...</h5> </div>`);
+
+                $(document.body).append(wall);
+
+                setTimeout(()=>{
+                    wall.addClass("built");
+                },100);
+
+                return l;
+            }
+        };
+
+        return l.start();
+    }
+
     export function ButtonStateSwapper(btn:HTMLElement){
         let content = "";
         let originalPointerEvent = "";

@@ -1,5 +1,5 @@
 import {Column, Entity, JoinTable, OneToMany} from "typeorm";
-import {BaseModel} from "./IModel";
+import {BaseModel, jsonIgnore} from "./IModel";
 import {ShareModel} from "./ShareModel";
 
 @Entity("stock_info")
@@ -28,10 +28,11 @@ export class StockModel extends BaseModel{
 
     @OneToMany(type => ShareModel, share => share.stockInfo)
     @JoinTable()
+    @jsonIgnore()
     public soldShares:ShareModel[];
 
     public get isOutdated():boolean{
-        return ( Date.now() >= this.lastTradingDate.getTime() );
+        return ( Date.now() >= this.lastTradingDate.getTime() || Date.now() >= this.updatedAt.getTime() + (15 * 60_000) );
     }
 
 }

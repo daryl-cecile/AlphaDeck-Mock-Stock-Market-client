@@ -98,6 +98,14 @@ section{
 		flex-direction: column;
 	}
 
+	&.column{
+		flex-direction: column;
+	}
+
+	&.d-block{
+		display: block;
+	}
+
 	.subnav{
 		background: @subnav-background;
 		color: @title-color;
@@ -118,34 +126,6 @@ section{
 		flex-direction: column;
 		width: 17.2rem;
 		border-right: 1px solid rgba(@light-border-color, 0.2);
-
-		.search{
-			padding: 0.4rem;
-			position: relative;
-
-			input{
-				width: 100%;
-				padding-left: 26px;
-
-				&:focus + svg{
-					color: @title-color;
-				}
-
-				&:not(:placeholder-shown) + svg{
-					color: @primary-btn-color;
-				}
-			}
-
-			svg{
-				display: block;
-				height: 34%;
-				position: absolute;
-				top: 34%;
-				left: 14px;
-				color: @light-border-color;
-				pointer-events: none;
-			}
-		}
 
 		.result{
 			.scrollGradient;
@@ -203,6 +183,172 @@ section{
 
 }
 
+.search{
+	padding: 0.4rem;
+	position: relative;
+
+	input[type="search"]{
+		width: 100%;
+		padding-left: 26px;
+
+		&:focus + svg{
+			color: @title-color;
+		}
+
+		&:not(:placeholder-shown) + svg{
+			color: @primary-btn-color;
+		}
+	}
+
+	svg{
+		display: block;
+		height: 1em;
+		position: absolute;
+		top: 30%;
+		left: 14px;
+		color: @light-border-color;
+		pointer-events: none;
+	}
+}
+
+.center-search-input{
+	width: 100%;
+	padding: 30px 0 20px;
+	position: relative;
+	z-index: 1;
+	display: flex;
+	background: rgba(white,0.8);
+	justify-content: center;
+	backdrop-filter: blur(6px) saturate(90%);
+
+	.search{
+		width: 100%;
+		max-width: 25rem;
+	}
+}
+
+div.grid-x3{
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	grid-gap: 15px;
+	grid-auto-rows: minmax(auto, 0);
+	//grid-auto-rows: minmax(92px, auto);
+
+	flex:1;
+	overflow-y: auto;
+	padding: 1rem 1rem 0;
+	max-height: calc(100% - 2.5rem);
+	position: relative;
+
+	&.withShadow{
+		margin-bottom: 2rem;
+		.scrollGradient;
+	}
+
+	.item{
+		background: white;
+		border: 1px solid @light-border-color;
+		box-shadow: 0 0 0 0 transparent;
+		transition: all .4s;
+		border-radius: @general-rounded-border;
+		padding: 10px;
+		position: relative;
+		height: 7.2rem;
+
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+
+		h5{ font-size: 1.2rem }
+		p { font-size: 0.6rem }
+		span { font-size: 0.8rem }
+
+		&[disabled]{
+			background: whitesmoke;
+			pointer-events: none;
+			opacity: 0.8;
+		}
+
+		*{
+			margin:0;
+			text-align: center;
+		}
+
+		.stock-mini-info{
+			width: 100%;
+		}
+
+		.btn-options{
+			width: 100%;
+			padding: 0;
+			display: flex;
+			flex-direction: row;
+			justify-content: space-between;
+			height: 30px;
+			margin: -20px 0;
+			pointer-events: none;
+			opacity: 0;
+			transition: all .2s;
+
+			button{
+				width: 49%;
+
+				&.primary:focus,
+				&.primary:hover{
+					color: white;
+					background: @primary-btn-color;
+					border-color: @primary-btn-color;
+				}
+
+				&.danger:hover,
+				&.danger:focus{
+					color: white;
+					background: @red;
+					border-color: @red;
+				}
+
+				&:hover{
+					opacity: 1;
+				}
+			}
+		}
+
+		&:hover,
+		&:focus-within{
+			border-color: transparent;
+			.smooth-shadow();
+
+			.btn-options{
+				padding: 10px 0 0;
+				margin: 0;
+				height: 40px;
+				pointer-events: auto;
+				opacity: 1;
+			}
+		}
+	}
+
+	&:empty{
+		display: flex;
+		align-items: center;
+		justify-content: center;
+
+		&::after{
+			font-size: 1.6rem;
+			color: rgba(@title-color, 0.5);
+		}
+	}
+
+	&:not([first_use]):empty::after{
+		content: 'Enter a search query to begin';
+	}
+
+	&[first_use]:empty::after{
+		content: 'Not found'
+	}
+}
+
 div.center-content{
 
 	display: flex;
@@ -215,4 +361,50 @@ div.center-content{
 		flex-direction: column;
 	}
 
+}
+
+div.wall{
+	position: fixed;
+	z-index: 50;
+	width:100%;
+	height: 100%;
+	top:0;
+	left:0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	background: rgba(white,0.4);
+	color: @text-color;
+	backdrop-filter: blur(0);
+	opacity: 0;
+	pointer-events: none;
+	transition: all .3s;
+	.gpu;
+
+	&.built{
+		opacity: 1;
+		backdrop-filter: blur(8px);
+		pointer-events: auto;
+	}
+
+	i{
+		font-size: 3rem;
+	}
+
+	h5{
+		margin: 1rem 0 0;
+		font-size: 1rem;
+		color: inherit;
+	}
+}
+
+div.dual{
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	grid-gap: 15px;
+	grid-auto-rows: minmax(auto, 0);
+
+	width: 100%;
+	max-width: 720px;
 }

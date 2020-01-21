@@ -12,11 +12,66 @@
 
     <%- include('../partials/aside',{user}) %>
 
-    <section class="center no-padd">
-        <h1 class="quiet">MARKET</h1>
+    <section class="no-padd column">
+
+        <div class="center-search-input">
+            <div class="search">
+                <input type="search" name="stock-search-term" id="finder" title="Find stocks" placeholder="Find stocks by name or symbol">
+                <%- include('../partials/search_svg') %>
+            </div>
+        </div>
+
+        <div class="grid-x3 withShadow" id="results"></div>
     </section>
 
 </main>
+
+<script>
+    function addResult(info){
+        let temp = `<div class="item" ${info.volume === 0 ? 'disabled' : ''}>
+                        <div class="stock-mini-info">
+                            <h5>${info.symbol}</h5>
+                            <p>${info.company}</p>
+                            <span>Valued at ${ info.currency } ${ info.price } per share</span>
+                        </div>
+                        <div class="btn-options">
+                            <button class="${info.volume === 0 ? '' : 'primary'}">BUY</button>
+                            <button class="${info.volume === 0 ? '' : 'danger'}">SELL</button>
+                        </div>
+                    </div>`;
+
+        $('#results').append(temp);
+    }
+
+    Tools.onReady(()=>{
+
+        let $result = $('#results');
+
+        $("#finder").on("keypress",function(e){
+            let self = this;
+            if (e.key === "Enter"){
+                $(self).prop("readonly","true");
+                let loader = Tools.showLoading();
+
+                Stock.findStock(self.value, (r)=>{
+                    loader.stop();
+                    $(self).prop("readonly","");
+                    $result.empty().attr("first_use","nope");
+                    if (r.isSuccessful){
+                        r.payload.forEach(p => {
+                            addResult(p);
+                        });
+                    }
+                    else{
+                        Tools.showAlert(r.title, r.message);
+                    }
+                });
+
+            }
+        });
+
+    });
+</script>
 
 <%- include('../partials/footer') %>
 </body>

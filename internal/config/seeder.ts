@@ -1,11 +1,12 @@
 import {UserModel} from "../models/UserModel";
 import {Passport} from "../Services/Passport";
 import {UserRepository} from "../Repository/UserRepository";
-import {StockService} from "../Services/StockService";
+import {StockResponseError, StockService} from "../Services/StockService";
 import {StockModel} from "../models/StockModel";
 import {StockRepository} from "../Repository/StockRepository";
 import {System} from "./System";
 import {TimeHelper} from "./TimeHelper";
+import {ForexService} from "../Services/ForexService";
 
 
 (async function(){
@@ -27,58 +28,53 @@ import {TimeHelper} from "./TimeHelper";
         return existingUser;
     }
 
-    async function seedStockInfo(symbol:string, companyName:string){
-        let stock = new StockModel();
-        stock.company = companyName;
-        stock.symbol = symbol;
-        stock.price = 0;
-        stock.volume = 0;
-        stock.volumeAtSync = 0;
-        stock.lastTradingDate = TimeHelper.minutesFromNow(1);
-
-        let existingStock = await StockRepository.findBySymbol(symbol);
-        if (existingStock === undefined){
-            return await StockRepository.save(stock);
-        }
-        return existingStock;
-    }
-
     await seedUser("Test User","testUser1","test123");
     await seedUser("Admin User","root","admin", true);
 
+    System.log("SKIP","SKIPPED SEEDING...");
+    return;
+
     let possibleResults = [
-        ... await StockService.queryStock("google", true),
-        ... await StockService.queryStock("apple", true),
-        ... await StockService.queryStock("amd", true),
-        ... await StockService.queryStock("qcom", true),
-        ... await StockService.queryStock("csco", true),
-        ... await StockService.queryStock("ge", true)
+        ... await StockService.queryStockInfo("google", true),
+        ... await StockService.queryStockInfo("apple", true),
+        ... await StockService.queryStockInfo("amd", true),
+        ... await StockService.queryStockInfo("qcom", true),
+        ... await StockService.queryStockInfo("csco", true),
+        ... await StockService.queryStockInfo("ge", true)
     ].filter( (value, index, array) => {
         return array.indexOf(value) === index && parseFloat(value.matchScore) >= 0.5 ; // unique and high confidence only
     } );
 
-    await System.log("Syncing",`Syncing ${possibleResults.length} items..`);
+    await System.log("Cache",`Caching ${possibleResults.length} items..`);
+
+    let maxEntriesToCache = possibleResults.length;
+    let entriesCached = 0;
 
     for (const info of possibleResults) {
         try{
-            let extraInfo = await StockService.getStockInfo(info.symbol, true);
 
-            console.log("Syncing",info.name,"->",info.symbol,'@',extraInfo.price,'per 1 of',extraInfo.volume,`[${extraInfo.latest_trading_day}]`);
+            entriesCached = possibleResults.indexOf(info) + 1;
 
-            let rec = await seedStockInfo(info.symbol, info.name);
-            rec.currency = info.currency;
-            rec.price = parseFloat(extraInfo.price);
-            rec.lastTradingDate = new Date(extraInfo.latest_trading_day);
-            rec.volume = parseInt(extraInfo.volume);
-            rec.volumeAtSync = rec.volume;
+            let rec = await StockService.getStock(info.symbol, info.name, info.currency);
 
-            await StockRepository.save(rec);
+            await System.log('Cache',`Caching [${entriesCached}/ ${maxEntriesToCache}] ${ (entriesCached/maxEntriesToCache) * 100 }% ${rec.name} -> ${rec.symbol} @ ${rec.price} per 1 of ${rec.volume} [${rec.latest_trading_day}]`);
 
         }
         catch(v){
             await System.error(v, System.ERRORS.SEED_ERROR);
-            break;
+
+            if ( v.originalError.constructor.name === "StockResponseError" ){
+                if (v.originalError.rateLimitReached) {
+                    await System.log("Cache",`Successfully cached ${entriesCached} of ${maxEntriesToCache} before rate limit`, System.ERRORS.STATUS_CHANGE);
+                    break;
+                }
+            }
+            else{
+                await System.log("Cache",`Successfully cached ${entriesCached} of ${maxEntriesToCache} before error [${StockService.serviceClass.lastEndpointUsed}]`, System.ERRORS.STATUS_CHANGE);
+                break;
+            }
         }
     }
+
 
 })();

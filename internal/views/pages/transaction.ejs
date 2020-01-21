@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <%- include('../partials/meta') %>
+    <title>Transaction - AlphaDeck</title>
+    <%- include('../partials/imports') %>
+</head>
+<body>
+<%- include('../partials/nav') %>
+
+<main class="shadow content fix-height">
+
+    <%- include('../partials/aside',{user}) %>
+
+    <section class="d-block">
+        <div class="subnav">
+            <h4>Transaction</h4>
+        </div>
+
+        <%- include('../partials/buy_stock_body', {user}) %>
+
+    </section>
+
+</main>
+
+<%- include('../partials/footer') %>
+</body>
+</html>

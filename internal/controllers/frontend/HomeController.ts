@@ -1,5 +1,8 @@
 import {RouterSet} from "../../config/RouterSet";
 import {Passport} from "../../Services/Passport";
+import {StockService} from "../../Services/StockService";
+import {StockRepository} from "../../Repository/StockRepository";
+import {ForexService} from "../../Services/ForexService";
 
 export const HomeController = new RouterSet( (router) => {
 
@@ -44,10 +47,11 @@ export const HomeController = new RouterSet( (router) => {
 
     router.get("/market", async function(req, res, next){
 
+        let col = await StockRepository.getAll();
         let authCheck = await Passport.isAuthenticated(req, res);
         if (authCheck.object.isSuccessful){
             let acc = authCheck.object.payload['user'];
-            res.render("pages/market", { user: acc });
+            res.render("pages/market", { user: acc , collection: col, ForexService });
         }
         else{
             res.redirect("/login");

@@ -24,6 +24,14 @@ export abstract class BaseModel implements IModel{
         return finalObject;
     }
 
+    valueOf(){
+        return this.toJSON();
+    }
+
+    toString(){
+        return JSON.stringify(this.toJSON());
+    }
+
     @PrimaryGeneratedColumn()
     id: number;
 

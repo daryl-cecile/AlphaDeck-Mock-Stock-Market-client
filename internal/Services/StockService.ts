@@ -1,13 +1,15 @@
 import {BaseService} from "./BaseService";
-import {APIResponse, Callback, isNullOrUndefined, isVoid, JsonObject} from "../config/convenienceHelpers";
+import {Callback, IAPIResponse, isNullOrUndefined, isVoid, JsonObject} from "../config/convenienceHelpers";
 import {SymbolResultData} from "../data/SymbolResultData";
 import {ApiCacheService} from "./ApiCacheService";
-import {ForexResultData} from "../data/ForexResultData";
 import {StockInfoData} from "../data/StockInfoData";
 import {System} from "../config/System";
 import {OptionRepository} from "../Repository/OptionRepository";
 import {TimeHelper} from "../config/TimeHelper";
 import {ApiCacheModel} from "../models/ApiCacheModel";
+import {StockRepository} from "../Repository/StockRepository";
+import {StockModel} from "../models/StockModel";
+import {AppError} from "../config/AppError";
 
 let superAgent = require("superagent");
 
@@ -21,36 +23,50 @@ enum Providers {
     ALPHA_VANTANGE
 }
 
-class StockResponseError extends APIResponse{
+export class StockResponseError extends Error implements IAPIResponse{
     public coreError: Error = undefined;
     public title: string;
     public message: string;
+
+    public endpointPath: string;
+    public rateLimitReached: boolean = false;
+    public response: any;
+
+    constructor(...props) {
+        super(...props);
+
+        // setTimeout(()=>{
+        //     if ( !isVoid(this.title) && !isVoid(this.message) ){
+        //         let e = isNullOrUndefined(this.coreError) ? new Error("StockResponseError Happened") : this.coreError;
+        //         System.error( e , System.ERRORS.NETWORK_RESULT_ERR , `${this.title}: ${this.message} \n @->${this.endpointPath}` );
+        //     }
+        // },1500).unref();
+    }
 
     public get isUnhandled(){
         return isNullOrUndefined(this.coreError) === false;
     }
 
-    public static wrap(err:Error, message?:string, title?:string){
+    public static wrap(err:Error, endpointPath:string, message?:string, title?:string){
         let n = new StockResponseError();
         n.coreError = err;
+        n.endpointPath = endpointPath;
+
         if (message) n.message = message;
+        else n.message = (err.message || "unknown error");
+
         if (title) n.title = title;
+        else n.title = (err.name || "Anonymous Error");
+
         return n;
-    }
-
-    constructor() {
-        super();
-
-        setTimeout(()=>{
-            if ( !isVoid(this.title) && !isVoid(this.message) ){
-                let e = isNullOrUndefined(this.coreError) ? new Error("StockResponseError Happened") : this.coreError;
-                System.error( e , System.ERRORS.NETWORK_RESULT_ERR , `${this.title}: ${this.message}` );
-            }
-        },1500).unref();
     }
 }
 
 class service extends BaseService{
+
+    public serviceClass = service;
+
+    public static lastEndpointUsed:string = null;
 
     private static getPathToAPI(endpoint:Endpoint, ...param:string[]){
         switch (endpoint) {
@@ -78,7 +94,9 @@ class service extends BaseService{
         for (let k in obj){
             if (obj.hasOwnProperty(k)) q += ( isVoid(q) ? "?" : "&" ) + `${k}=${obj[k]}`;
         }
-        return `https://www.alphavantage.co/query${q}&apikey=${process.env.ALPHA_VANTAGE_API}`;
+        let endpoint = `https://www.alphavantage.co/query${q}&apikey=${process.env.ALPHA_VANTAGE_API}`;
+        this.lastEndpointUsed = endpoint;
+        return endpoint;
     }
 
     private static async handleRateLimit(provider:Providers){
@@ -111,7 +129,7 @@ class service extends BaseService{
         }
         else{
             if (isRateLimited === true){
-                reject("Requested resource not in cache and API Key has been rate-limited. Retrying in 5min...");
+                reject(AppError.fromMessage("Requested resource not in cache and API Key has been rate-limited. Retrying in 1min..."));
                 return true;
             }
         }
@@ -127,7 +145,7 @@ class service extends BaseService{
             let endpointPath = service.getPathToAPI(Endpoint.AV_QUERY_SYMBOL, term);
 
             superAgent.get(endpointPath).end((err, res)=>{
-                if (err) return callback(StockResponseError.wrap(err), undefined);
+                if (err) return callback(StockResponseError.wrap(err, endpointPath), undefined);
 
                 let oldCallback = callback;
 
@@ -138,6 +156,7 @@ class service extends BaseService{
 
                 let result = res.body;
                 let sre = new StockResponseError();
+                sre.endpointPath = endpointPath;
                 sre.response = result;
 
                 if (result['bestMatches']){
@@ -177,7 +196,7 @@ class service extends BaseService{
 
     }
 
-    public async queryStock<R = SymbolResultData[]>(term:string, forceUseCache:boolean=false){
+    public async queryStockInfo<R = SymbolResultData[]>(term:string, forceUseCache:boolean=false){
         let endpointPath = service.getPathToAPI(Endpoint.AV_QUERY_SYMBOL, term);
         let cachedResult = await ApiCacheService.getEntry(endpointPath);
 
@@ -192,7 +211,7 @@ class service extends BaseService{
                 if (err){
                     if (err.rateLimitReached === true){
                         if ( isNullOrUndefined(cachedResult) ){
-                            reject(err.message + "... and cache did not have a backup result for this request");
+                            reject(AppError.createFrom(err));
                             return -1;
                         }
                         else{
@@ -201,7 +220,7 @@ class service extends BaseService{
                         }
                     }
                     else{
-                        reject(err.message);
+                        reject(AppError.fromMessage(err.message, err));
                         return -1;
                     }
                 }
@@ -217,103 +236,6 @@ class service extends BaseService{
     }
 
 
-
-    // FOREX
-
-    private async doPoll<R = JsonObject|ForexResultData>(fromCurrency:string, toCurrency:string, callback:Callback<StockResponseError, R>){
-        return new Promise<R>(resolve => {
-
-            let endpointPath = service.getPathToAPI(Endpoint.AV_FOREIGN_EXCHANGE, fromCurrency, toCurrency);
-
-            superAgent.get(endpointPath).end((err, res)=>{
-                if (err) return callback(StockResponseError.wrap(err), undefined);
-                let oldCallback = callback;
-
-                callback = async (err, param) => {
-                    let r = await oldCallback(err, param);
-                    resolve( isNullOrUndefined(r) ? param : r );
-                };
-
-                let result = res.body;
-                let sre = new StockResponseError();
-                sre.response = result;
-
-                if (result["Realtime Currency Exchange Rate"]){
-                    let item = new ForexResultData(result["Realtime Currency Exchange Rate"]);
-                    callback(undefined, <any>item);
-                }
-                else if (result['Note']){
-                    sre.title = "Note";
-                    sre.message = result['Note'];
-                    if (result['Note'].indexOf("API call frequency") > -1) {
-                        sre.rateLimitReached = true;
-                        service.handleRateLimit(Providers.ALPHA_VANTANGE);
-                    }
-                    callback(sre, <any>result);
-                }
-                else if (result['Information']){
-                    sre.title = "Information";
-                    sre.message = result['Information'];
-                    callback(sre, <any>result);
-                }
-                else if (result['Error Message']){
-                    sre.title = "Error Message";
-                    sre.message = result['Error Message'];
-                    callback(sre, <any>result);
-                }
-                else {
-                    sre.title = "Format error";
-                    sre.message = "Response was in unknown format";
-                    callback(sre, undefined);
-                }
-
-            });
-
-        });
-    }
-
-    public async getExchange<R = ForexResultData>(fromCurrency:string, toCurrency:string, forceUseCache:boolean=false){
-        let endpointPath = service.getPathToAPI(Endpoint.AV_FOREIGN_EXCHANGE, fromCurrency, toCurrency);
-        let cachedResult = await ApiCacheService.getEntry(endpointPath);
-
-        return new Promise<ForexResultData>(async (resolve, reject) => {
-
-            if ( await service.performCacheCheck<ForexResultData>(cachedResult,forceUseCache,resolve,reject) ){
-                // handled using cache so return;
-                return;
-            }
-
-            this.doPoll<ForexResultData>(fromCurrency, toCurrency, async (err, param) => {
-                if (err){
-                    if (err.rateLimitReached === true){
-                        if ( isNullOrUndefined(cachedResult) ){
-                            reject(err.message + "... and cache did not have a backup result for this request");
-                            return -1;
-                        }
-                        else{
-                            param = <ForexResultData>JSON.parse(cachedResult.result);
-                            return param;
-                        }
-                    }
-                    else{
-                        reject(err.message);
-                        return -1;
-                    }
-                }
-                else{
-                    return param;
-                }
-            }).then(response => {
-                service.updateCache(endpointPath, response);
-
-                resolve(response);
-            }).catch(x => {
-                System.error(x, System.ERRORS.CALLBACK_ERR);
-            });
-        });
-    }
-
-
     // GLOBAL STOCK INFO
 
     private async doFetchStockInfo<R = JsonObject|StockInfoData>(symbol:string, callback:Callback<StockResponseError, R>){
@@ -322,7 +244,7 @@ class service extends BaseService{
             let endpointPath = service.getPathToAPI(Endpoint.AV_GLOBAL_STOCK_INFO, symbol);
 
             superAgent.get(endpointPath).end((err, res)=>{
-                if (err) return callback(StockResponseError.wrap(err), undefined);
+                if (err) return callback(StockResponseError.wrap(err,endpointPath), undefined);
                 let oldCallback = callback;
 
                 callback = async (err, param) => {
@@ -332,6 +254,7 @@ class service extends BaseService{
 
                 let result = res.body;
                 let sre = new StockResponseError();
+                sre.endpointPath = endpointPath;
                 sre.response = result;
 
                 if (result["Global Quote"]){
@@ -383,7 +306,7 @@ class service extends BaseService{
                 if (err){
                     if (err.rateLimitReached === true){
                         if ( isNullOrUndefined(cachedResult) ){
-                            reject(err.message + "... and cache did not have a backup result for this request");
+                            reject(AppError.createFrom(err));
                             return -1;
                         }
                         else{
@@ -392,7 +315,7 @@ class service extends BaseService{
                         }
                     }
                     else{
-                        reject(err.message);
+                        reject(AppError.fromMessage(err.message,err));
                         return -1;
                     }
                 }
@@ -407,6 +330,87 @@ class service extends BaseService{
         });
     }
 
+
+    // ALPHADECK
+
+    public async getStock(symbol:string);
+    public async getStock(symbol:string, companyName:string, currency:string);
+    public async getStock(symbol:string, companyName?:string, currency?:string){
+        await System.log("Task",`getStock - symb: ${symbol}, cpN: ${companyName}, cny: ${currency}`);
+        let extraInfo = await StockService.getStockInfo(symbol, true);
+
+        let rec = (await StockRepository.findBySymbol(symbol));
+
+        if (isNullOrUndefined(rec)){
+            let info = isVoid(companyName) ? (await StockService.queryStockInfo(symbol, true))[0] : {
+                name: companyName,
+                currency: currency
+            };
+
+            rec = new StockModel();
+            rec.symbol = symbol;
+            rec.company = info.name;
+            rec.currency = info.currency;
+            rec.price = parseFloat(extraInfo.price);
+            rec.lastTradingDate = new Date(extraInfo.latest_trading_day);
+            rec.volume = parseInt(extraInfo.volume);
+            rec.volumeAtSync = rec.volume;
+
+            return await StockRepository.save(rec);
+        }
+        else{
+            if (rec.isOutdated){
+                rec.volume = rec.volumeAtSync;
+                rec.price = parseFloat(extraInfo.price);
+                rec.volumeAtSync = parseInt(extraInfo.volume);
+                rec.lastTradingDate = new Date(extraInfo.latest_trading_day);
+                return await StockRepository.save(rec);
+            }
+            return rec;
+        }
+
+    }
+
+    public async queryStock(term:string, localFirst:boolean=true):Promise<StockModel[]>{
+        await System.log("Task",`queryStock - term: ${term}, localF: ${localFirst}`);
+
+        let queryByTermsResult:StockModel[] = [];
+        let finalResults = [];
+
+        if (localFirst === true){
+            queryByTermsResult = await StockRepository.queryByTerms(term);
+
+            if (queryByTermsResult.length >= 5){
+                return queryByTermsResult;
+            }
+        }
+
+        try{
+            let results = await this.queryStockInfo(term);
+
+            for (const r of results) {
+                try{
+                    if ( queryByTermsResult.filter(rx => rx.symbol === r.symbol).length > 0 ){
+                        finalResults.push( ...queryByTermsResult.filter(rx => rx.symbol === r.symbol) );
+                    }
+                    else{
+                        let v = await this.getStock(r.symbol, r.name, r.currency);
+                        finalResults.push(v);
+                    }
+                } catch(x){
+                    /*noop*/
+                    await System.error(x, System.ERRORS.PROMISE_ERR)
+                }
+            }
+        }
+        catch(x){
+            /* noop */
+            await System.error(x, System.ERRORS.PROMISE_ERR)
+        }
+
+        return finalResults;
+
+    }
 }
 
 export const StockService = new service();

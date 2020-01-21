@@ -1,5 +1,6 @@
 import {BaseRepository} from "./BaseRepository";
 import {StockModel} from "../models/StockModel";
+import {Like} from "typeorm";
 
 class repo extends BaseRepository<StockModel>{
 
@@ -11,8 +12,19 @@ class repo extends BaseRepository<StockModel>{
         return await this.repo.findOne({
             where : {
                 symbol : symbol
-            }
+            },
+            relations: ['soldShares']
         })
+    }
+
+    async queryByTerms(term:string){
+        return await this.repo.find({
+            where : [
+                { company : Like(`%${term}%`) },
+                { symbol : Like(`%${term}%`) }
+            ],
+            relations: ['soldShares']
+        });
     }
 
 }

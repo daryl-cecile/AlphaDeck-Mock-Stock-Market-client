@@ -10,6 +10,7 @@
     "fix": "npm i && npm run build",
     "build": "node build.js && tsc --project tsconfig.json",
     "local": "npm run build && node -r dotenv/config index.js",
+    "quick_local": "node -r dotenv/config index.js",
     "start": "node index.js",
     "debug_local": "node -r dotenv/config index.js",
     "typeorm": "ts-node --project tsconfig.json -r dotenv/config ./node_modules/typeorm/cli.js",

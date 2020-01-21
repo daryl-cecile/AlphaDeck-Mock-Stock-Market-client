@@ -1,10 +1,11 @@
 import {SystemLogEntryModel} from "../models/SystemLogEntryModel";
 import {SystemLogRepository} from "../Repository/SystemLogRepository";
-import {XError} from "./XError";
 import {CookieStore} from "./CookieHelper";
 import {dbConnector as db} from "./DBConnection";
 import * as core from "express-serve-static-core";
 import {RouterSet} from "./RouterSet";
+import {AppError} from "./AppError";
+import {isNullOrUndefined} from "./convenienceHelpers";
 
 const eventManager = require('./GlobalEvents');
 
@@ -13,6 +14,7 @@ export namespace System{
     const backlog:SystemLogEntryModel[] = [];
     let interval = null;
     let isProd:boolean = null;
+    let isCI:boolean = null;
     let ignoreOutput:boolean = false;
 
     export let rootPath:string = "";
@@ -29,8 +31,12 @@ export namespace System{
     };
 
     export function isProduction(){
-        // check if .env file exists; if so, we are running dev mode, otherwise prod
-        if (isProd === null) isProd = (process.env?.CI == "true");
+        if (isProd === null) isProd = (process.env.PROD == "true");
+        return isProd;
+    }
+
+    export function isCircularIntegration(){
+        if (isCI === null) isCI = (process.env.CI == "true");
         return isProd;
     }
 
@@ -53,13 +59,8 @@ export namespace System{
         attemptSafeTerminate();
     }
 
-    export async function error(err:Error,errcode?:System.ERRORS,extraInfo?:string){
-        let e = XError.createFrom(err);
-        let rSF = e.stackFrames?.[0] || {
-            fileName:"<unknown>",
-            lineNumber:"-1",
-            columnNumber:"-800"
-        };
+    export async function error(err:Error|AppError,errcode?:System.ERRORS,extraInfo?:string){
+        let e = <AppError>(!isNullOrUndefined(err['isAppError']) ? err : AppError.createFrom(err));
         let message = e.message;
 
         let xs = (err || err.stack).toString() + "\n\n\n";
@@ -69,7 +70,7 @@ export namespace System{
             xs += extraInfo;
         }
 
-        await System.log(e.type, `${rSF.fileName}:${rSF.lineNumber}:${rSF.columnNumber}\n\t${message}`, errcode, xs);
+        await System.log(e.type, `${e.originalStack ?? e.stack}\n\t${message}`, errcode, xs);
     }
 
     export async function log(title:string, message:string, errCode?:System.ERRORS, extras:string=""){
@@ -177,6 +178,7 @@ export namespace System{
             if (reason && reason['stack']){
                 System.error(<any>reason, ERRORS.PROMISE_ERR, reason['stack']);
             }
+            else System.error(new Error("Unable to handle unhandledRejection"), ERRORS.PROMISE_ERR);
         });
 
         // catch app level errors in case

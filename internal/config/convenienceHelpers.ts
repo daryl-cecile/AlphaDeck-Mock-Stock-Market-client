@@ -22,9 +22,10 @@ export type ErrorCallback<E = Error> = (err:E)=>void;
 
 export type Callback<E = Error, R = any> = (err?:E|undefined, param?:R)=>any;
 
-export class APIResponse{
-    public rateLimitReached:boolean = false;
-    public response:any;
+export interface IAPIResponse{
+    rateLimitReached:boolean;
+    response:any;
+    endpointPath:string;
 }
 
 export type ObjectProperties<O> = { [K in keyof O]?: O[K] };
