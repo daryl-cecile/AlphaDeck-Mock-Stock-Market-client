@@ -333,16 +333,31 @@ class service extends BaseService{
 
     // ALPHADECK
 
-    public async getStock(symbol:string):Promise<StockModel>;
-    public async getStock(symbol:string, companyName:string, currency:string):Promise<StockModel>;
-    public async getStock(symbol:string, companyName?:string, currency?:string):Promise<StockModel>{
+    public async getStock(symbol:string, forceUseCache?:boolean):Promise<StockModel>;
+    public async getStock(symbol:string, companyName:string, currency:string, forceUseCache?:boolean):Promise<StockModel>;
+    public async getStock(symbol:string, companyName?:string, currency?:string, forceUseCache?:boolean):Promise<StockModel>;
+    public async getStock(symbol:string, companyNameOrCache?:string|boolean, currency?:string, forceUseCache:boolean=true):Promise<StockModel>{
+        let companyName;
+
+        if ( isNullOrUndefined(companyNameOrCache) ){
+            companyName = undefined;
+            forceUseCache = true;
+        }
+        else if ( typeof companyNameOrCache === "string" || <any>companyNameOrCache instanceof String ){
+            companyName = companyNameOrCache;
+        }
+        else if ( typeof companyNameOrCache === "boolean" || <any>companyNameOrCache instanceof Boolean ){
+            companyName = undefined;
+            forceUseCache = companyNameOrCache;
+        }
+
         await System.log("Task",`getStock - symb: ${symbol}, cpN: ${companyName}, cny: ${currency}`);
-        let extraInfo = await StockService.getStockInfo(symbol, true);
+        let extraInfo = await StockService.getStockInfo(symbol, forceUseCache);
 
         let rec = (await StockRepository.findBySymbol(symbol));
 
         if (isNullOrUndefined(rec)){
-            let info = isVoid(companyName) ? (await StockService.queryStockInfo(symbol, true))[0] : {
+            let info = isVoid(companyName) ? (await StockService.queryStockInfo(symbol, forceUseCache))[0] : {
                 name: companyName,
                 currency: currency
             };

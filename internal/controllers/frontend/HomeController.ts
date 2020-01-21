@@ -3,6 +3,9 @@ import {Passport} from "../../Services/Passport";
 import {StockService} from "../../Services/StockService";
 import {StockRepository} from "../../Repository/StockRepository";
 import {ForexService} from "../../Services/ForexService";
+import {SharesRepository} from "../../Repository/SharesRepository";
+import {isNullOrUndefined} from "../../config/convenienceHelpers";
+import {System} from "../../config/System";
 
 export const HomeController = new RouterSet( (router) => {
 
@@ -11,7 +14,15 @@ export const HomeController = new RouterSet( (router) => {
         let authCheck = await Passport.isAuthenticated(req, res);
         if (authCheck.object.isSuccessful){
             let acc = authCheck.object.payload['user'];
-            res.render("pages/homepage", { user: acc });
+            let shares = isNullOrUndefined(acc) ? [] : await SharesRepository.findByUser(acc);
+            res.render("pages/homepage", { user: acc, shares:shares });
+
+            for (let share of shares){
+                try{ StockService.getStockInfo(share.stockInfo.symbol, false); }catch(x){
+                    /*noop*/
+                    await System.log("Cache Update","Failed to update a cache entry", System.ERRORS.PROMISE_ERR, x.toString())
+                }
+            }
         }
         else{
             res.redirect("/login");

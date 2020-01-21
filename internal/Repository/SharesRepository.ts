@@ -1,5 +1,6 @@
 import {BaseRepository} from "./BaseRepository";
 import {ShareModel} from "../models/ShareModel";
+import {UserModel} from "../models/UserModel";
 
 class repo extends BaseRepository<ShareModel>{
 
@@ -11,6 +12,15 @@ class repo extends BaseRepository<ShareModel>{
         return await this.repo.findOne({
             where : {
                 id : id
+            },
+            relations: ['stockInfo','owner']
+        })
+    }
+
+    async findByUser(user:UserModel){
+        return await this.repo.find({
+            where : {
+                owner: user
             },
             relations: ['stockInfo','owner']
         })

@@ -24,23 +24,19 @@
             </div>
             <div class="result">
 
-                <div class="item">
-                    <h5>GOOG</h5>
-                    <p>Google Inc</p>
-                    <span>$146.39</span>
-                </div>
+                <% for (let n of shares){ %>
+                    <div class="item">
+                        <h5><%= n.stockInfo.symbol %></h5>
+                        <p><%= n.stockInfo.company %></p>
+                        <span>B: <%= n.boughtAtPrice %>, C: <%= n.stockInfo.price %></span>
+                    </div>
+                <% } %>
 
-                <div class="item selected">
-                    <h5>GOOG</h5>
-                    <p>Google Inc</p>
-                    <span>$146.39</span>
-                </div>
-
-                <div class="item">
-                    <h5>GOOG</h5>
-                    <p>Google Inc</p>
-                    <span>$146.39</span>
-                </div>
+<!--                <div class="item selected">-->
+<!--                    <h5>GOOG</h5>-->
+<!--                    <p>Google Inc</p>-->
+<!--                    <span>$146.39</span>-->
+<!--                </div>-->
 
             </div>
         </div>
