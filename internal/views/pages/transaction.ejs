@@ -14,14 +14,74 @@
 
     <section class="d-block">
         <div class="subnav">
-            <h4>Transaction</h4>
+            <h4>Transaction: <%=intent%> shares for <%=symbol%></h4>
         </div>
 
-        <%- include('../partials/buy_stock_body', {user}) %>
+        <% if (intent === "BUY"){ %>
+            <%- include('../partials/buy_stock_body', {user}) %>
+        <% } else { %>
+            <%- include('../partials/sell_stock_body', {user}) %>
+        <% } %>
 
     </section>
 
 </main>
+
+<script>
+    const INTENT = '<%=intent%>';
+    const SYMBOL = '<%=symbol%>';
+    let loadingIndicator = Tools.showLoading();
+
+    function checkCanSell(callback){
+        AlphaDeck.getOwnedShareInfo(SYMBOL, (r)=>{
+            if (r.isSuccessful){
+                if (Object.keys(r.payload).length > 0){
+                    loadingIndicator.stop();
+                    if (callback) callback(r.payload);
+                }
+                else{
+                    Tools.showAlert("No shares", "You do not currently own any shares in " + SYMBOL + " to sell.",()=>{
+                        history.back();
+                    });
+                }
+            }
+            else{
+                Tools.showAlert("Unknown error", "We were unable to prepare this transaction. Please try again",()=>{
+                    location.reload();
+                });
+            }
+        });
+    }
+
+    function checkCanBuy(callback){
+        AlphaDeck.getSingleStock(SYMBOL,(r)=>{
+            if (r.isSuccessful){
+                if (Object.keys(r.payload).length > 0){
+                    loadingIndicator.stop();
+                    if (callback) callback(r.payload);
+                }
+                else{
+                    Tools.showAlert("Stock not found", "This stock is either no longer available for trading.",()=>{
+                        history.back();
+                    });
+                }
+            }
+            else{
+                Tools.showAlert("Unknown error", "We were unable to get any information about this stock. Please try again shortly",()=>{
+                    location.reload();
+                });
+            }
+        });
+    }
+
+    if (INTENT === "SELL"){
+        checkCanSell();
+    }
+    else{
+        checkCanBuy();
+    }
+
+</script>
 
 <%- include('../partials/footer') %>
 </body>

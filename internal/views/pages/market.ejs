@@ -27,6 +27,34 @@
 </main>
 
 <script>
+    function buy(symbol, elem=undefined){
+        let loader = Tools.ButtonStateSwapper(elem);
+        if (elem) loader.setLoading();
+        location.href = "/transaction?intent=BUY&symbol=" + symbol;
+    }
+
+    function sell(symbol, elem=undefined){
+
+        let loader = Tools.ButtonStateSwapper(elem);
+        if (elem) loader.setLoading();
+
+        AlphaDeck.getOwnedShareInfo(symbol, (r)=>{
+            if (elem) loader.reset();
+            if (r.isSuccessful){
+                if (Object.keys(r.payload).length > 0){
+                    location.href = "/transaction?intent=SELL&symbol=" + symbol;
+                }
+                else{
+                    Tools.showAlert("No shares to sell", "You do not currently own any shares for this stock to sell.");
+                }
+            }
+            else{
+                Tools.showAlert(r.title, r.message);
+            }
+        });
+
+    }
+
     function addResult(info){
         let temp = `<div class="item" ${info.volume === 0 ? 'disabled' : ''}>
                         <div class="stock-mini-info">
@@ -35,8 +63,8 @@
                             <span>Valued at ${ info.currency } ${ info.price } per share</span>
                         </div>
                         <div class="btn-options">
-                            <button class="${info.volume === 0 ? '' : 'primary'}">BUY</button>
-                            <button class="${info.volume === 0 ? '' : 'danger'}">SELL</button>
+                            <button onclick="buy('${info.symbol}', this)" class="${info.volume === 0 ? '' : 'primary'}">BUY</button>
+                            <button onclick="sell('${info.symbol}', this)" class="${info.volume === 0 ? '' : 'danger'}">SELL</button>
                         </div>
                     </div>`;
 
@@ -51,9 +79,9 @@
             let self = this;
             if (e.key === "Enter"){
                 $(self).prop("readonly","true");
-                let loader = Tools.showLoading();
+                let loader = Tools.showLoading(true);
 
-                Stock.findStock(self.value, (r)=>{
+                AlphaDeck.findStock(self.value, (r)=>{
                     loader.stop();
                     $(self).prop("readonly","");
                     $result.empty().attr("first_use","nope");

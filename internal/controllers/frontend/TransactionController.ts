@@ -1,5 +1,6 @@
 import {RouterSet} from "../../config/RouterSet";
 import {Passport} from "../../Services/Passport";
+import {isVoid} from "../../config/convenienceHelpers";
 
 export const TransactionController = new RouterSet( (router) => {
 
@@ -11,8 +12,15 @@ export const TransactionController = new RouterSet( (router) => {
 
         let authCheck = await Passport.isAuthenticated(req, res);
         if (authCheck.object.isSuccessful){
-            let acc = authCheck.object.payload['user'];
-            res.render("pages/transaction", { user: acc });
+
+            if ( ( req.query['intent'] !== "SELL" && req.query['intent'] !== "BUY" ) || isVoid(req.query['symbol']) ){
+                res.render("pages/not_found");
+            }
+            else{
+                let acc = authCheck.object.payload['user'];
+                res.render("pages/transaction", { user: acc , intent: req.query['intent'], symbol: req.query['symbol'] });
+            }
+
         }
         else{
             res.redirect("/login");

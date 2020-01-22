@@ -5,6 +5,7 @@ import {UserRepository} from "../Repository/UserRepository";
 import {SessionRepository} from "../Repository/SessionRepository";
 import {TimeHelper} from "../config/TimeHelper";
 import {System} from "../config/System";
+import {isNullOrUndefined} from "../config/convenienceHelpers";
 
 const Crypto = require("crypto");
 const uuid = require("uuid/v4");
@@ -17,6 +18,11 @@ export namespace Passport{
             return authCheck.object.payload['user'];
         }
         return undefined;
+    }
+
+    export async function getCurrentUserFromSession(sessionKey:string):Promise<UserModel>{
+        let authCheck = await Passport.getSessionIfValid(sessionKey);
+        return authCheck?.owner;
     }
 
     export function createSaltine(){
@@ -117,18 +123,36 @@ export namespace Passport{
 
     }
 
+    export async function getSessionIfValid(sessionKey:string){
+
+        let session = await SessionRepository.getBySessionKey(sessionKey);
+
+        if (session && session.IsValid){
+            return session;
+        }
+        return undefined;
+
+    }
+
     export async function voidSession(req, res){
 
         let authCheck = await this.isAuthenticated(req, res);
 
         if (authCheck.object.isSuccessful){
-
             // user is authenticated, void session
-
             let user:UserModel = authCheck.object.payload['user'];
-            user.currentSession.invalid = true;
-            await SessionRepository.save(user.currentSession);
+            await voidSessionBySessionKey(user.currentSession.sessionKey);
+        }
 
+    }
+
+    export async function voidSessionBySessionKey(sessionKey:string){
+
+        let session = await getSessionIfValid(sessionKey);
+
+        if ( isNullOrUndefined(session) === false ){
+            session.owner.currentSession.invalid = true;
+            await SessionRepository.save(session.owner.currentSession);
         }
 
     }

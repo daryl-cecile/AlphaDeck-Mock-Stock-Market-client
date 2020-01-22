@@ -60,7 +60,11 @@ namespace Tools{
         return getCookie("_csrf");
     }
 
-    export function showLoading(){
+    export function sessionKey(){
+        return getCookie("_passport");
+    }
+
+    export function showLoading(autoStart:boolean=true){
         let id = "loading-fence";
         let l = {
             stop : ()=>{
@@ -83,7 +87,7 @@ namespace Tools{
             }
         };
 
-        return l.start();
+        return (autoStart ? l.start() : l);
     }
 
     export function ButtonStateSwapper(btn:HTMLElement){
@@ -106,7 +110,7 @@ namespace Tools{
         return l;
     }
 
-    export function showAlert(title:string, message:string){
+    export function showAlert(title:string, message:string, optionalCallback?){
         let m = new XModal(message,title, XModalType.ALERT);
 
         let initialOverflow = document.body.style.overflow;
@@ -118,6 +122,7 @@ namespace Tools{
                 text: "Okay",
                 callback: ()=>{
                     document.body.style.overflow = initialOverflow;
+                    if (optionalCallback) optionalCallback();
                 }
             }
         });

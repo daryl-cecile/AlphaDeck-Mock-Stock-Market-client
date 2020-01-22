@@ -82,7 +82,7 @@
             return;
         }
 
-        $.post("/api/do-signup", requestObject , res => {
+        $.post("/touch/do-signup", requestObject , res => {
             btnState.reset();
             if (res.isSuccessful){
 

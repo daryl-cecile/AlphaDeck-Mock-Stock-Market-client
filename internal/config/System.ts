@@ -5,7 +5,8 @@ import {dbConnector as db} from "./DBConnection";
 import * as core from "express-serve-static-core";
 import {RouterSet} from "./RouterSet";
 import {AppError} from "./AppError";
-import {isNullOrUndefined} from "./convenienceHelpers";
+import {isNullOrUndefined, isVoid} from "./convenienceHelpers";
+import {Passport} from "../Services/Passport";
 
 const eventManager = require('./GlobalEvents');
 
@@ -233,6 +234,14 @@ export namespace System{
                     app.use("/api", hostRouter);
                 });
                 return loaders;
+            },
+            registerReadOnlyEndpointControllers: (...routers:RouterSet[])=>{
+                let hostRouter = require('express').Router();
+                routers.forEach(r => {
+                    hostRouter = r.getRouter(hostRouter);
+                    app.use("/touch", hostRouter);
+                });
+                return loaders;
             }
         };
 
@@ -273,25 +282,33 @@ export namespace System{
 
         export function CSRFHandler(){
             const CSRFCookieName = "_csrf";
-            return function (req, res, next){
-                if ( req.url.startsWith("/api/") ){
+            return async function (req, res, next){
+                if ( req.url.startsWith("/touch/") ){
+                    next();
+                }
+                else if ( req.url.startsWith("/api/") ){
                     let cookieCSRF = cookieStore.get(CSRFCookieName);
+                    let providedCSRFToken = req.header('CSRF-Token') ?? req.header('X-CSRF-TOKEN') ?? req.query['CSRF_Token'] ?? req.body['CSRF_Token'];
 
-                    if (cookieCSRF === undefined){
-                        res.status(403);
-                        res.send('CSRF token invalid');
-                    }
-                    else{
-                        let providedCSRFToken = req.header('CSRF-Token') ?? req.header('X-CSRF-TOKEN') ?? req.query['CSRF_Token'] ?? req.body['CSRF_Token'];
-                        if (providedCSRFToken === undefined || providedCSRFToken !== cookieCSRF){
-                            res.status(403);
-                            res.send('CSRF token mismatch');
-                        }
-                        else{
+                    if ( isVoid(cookieCSRF) || isVoid(providedCSRFToken) ){
+                        if ( (isNullOrUndefined(req.query['sessionKey']) === false) && ( isNullOrUndefined(await Passport.getSessionIfValid(req.query['sessionKey'])) === false ) ){
                             next();
                         }
+                        else if ( (isNullOrUndefined(req.header('sessionKey')) === false) && ( isNullOrUndefined(await Passport.getSessionIfValid(req.header('sessionKey'))) === false ) ){
+                            next();
+                        }
+                        else{
+                            res.status(403);
+                            res.send('Token invalid');
+                        }
                     }
-
+                    else if (providedCSRFToken !== cookieCSRF){
+                        res.status(403);
+                        res.send('CSRF token mismatch');
+                    }
+                    else{
+                        next();
+                    }
                 }
                 else{
                     let csrfToken = require("crypto").randomBytes(32).toString('hex');

@@ -38,8 +38,11 @@ module.exports = {
 
         // Routes
         loader.registerEndpointControllers(
-            LoginEndpointController,
             SharesEndpointController
+        );
+
+        loader.registerReadOnlyEndpointControllers(
+            LoginEndpointController
         );
 
         loader.registerBaseControllers(

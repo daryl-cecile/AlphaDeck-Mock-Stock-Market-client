@@ -1,8 +1,7 @@
 import {Passport} from "../../Services/Passport";
 import {RouterSet} from "../../config/RouterSet";
-import {UserRepository} from "../../Repository/UserRepository";
 import {UserService} from "../../Services/UserService";
-import {JSONResponse, oResponse} from "../../config/JSONResponse";
+import {oResponse} from "../../config/JSONResponse";
 import {UserModel} from "../../models/UserModel";
 
 export const LoginEndpointController = new RouterSet((router)=>{
@@ -93,6 +92,11 @@ export const LoginEndpointController = new RouterSet((router)=>{
         );
         res.end();
 
+    });
+
+    router.post("/do-logout", async function(req, res){
+        await Passport.voidSessionBySessionKey( req.query['sessionKey'] || req.header('sessionKey') );
+        res.json(oResponse(true));
     });
 
     return router;
