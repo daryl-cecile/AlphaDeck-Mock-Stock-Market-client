@@ -85,16 +85,16 @@ class service extends BaseService{
         log.symbol = share.stockInfo.symbol;
         log.transactionType = TransactionType.SELL;
 
-        seller.credit += worth;
+        seller.credit = parseFloat(seller.credit + "") + parseFloat(worth + "");
         seller.ownedShares = seller.ownedShares.filter(os => os.id !== share.id);
         seller.transactions.push(log);
 
         share.stockInfo.volume += share.quantity;
 
         await StockRepository.update(share.stockInfo);
-        await TransactionLogRepository.update(log);
         await UserRepository.update(seller);
         await SharesRepository.delete(share);
+        await TransactionLogRepository.update(log);
     }
 
 }
