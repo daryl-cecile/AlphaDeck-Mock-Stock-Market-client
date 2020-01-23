@@ -7,6 +7,7 @@ import {RouterSet} from "./RouterSet";
 import {AppError} from "./AppError";
 import {isNullOrUndefined, isVoid} from "./convenienceHelpers";
 import {Passport} from "../Services/Passport";
+import {oResponse} from "./JSONResponse";
 
 const eventManager = require('./GlobalEvents');
 
@@ -291,20 +292,17 @@ export namespace System{
                     let providedCSRFToken = req.header('CSRF-Token') ?? req.header('X-CSRF-TOKEN') ?? req.query['CSRF_Token'] ?? req.body['CSRF_Token'];
 
                     if ( isVoid(cookieCSRF) || isVoid(providedCSRFToken) ){
-                        if ( (isNullOrUndefined(req.query['sessionKey']) === false) && ( isNullOrUndefined(await Passport.getSessionIfValid(req.query['sessionKey'])) === false ) ){
-                            next();
-                        }
-                        else if ( (isNullOrUndefined(req.header('sessionKey')) === false) && ( isNullOrUndefined(await Passport.getSessionIfValid(req.header('sessionKey'))) === false ) ){
+                        if ( (isNullOrUndefined(req.header('sessionKey')) === false) && ( isNullOrUndefined(await Passport.getSessionIfValid(req.header('sessionKey'))) === false ) ){
                             next();
                         }
                         else{
                             res.status(403);
-                            res.send('Token invalid');
+                            res.json( oResponse(false,'CSRF Check failed','Token is missing or invalid') );
                         }
                     }
                     else if (providedCSRFToken !== cookieCSRF){
                         res.status(403);
-                        res.send('CSRF token mismatch');
+                        res.json( oResponse(false, 'CSRF Check failed','Token mismatch error') );
                     }
                     else{
                         next();

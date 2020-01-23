@@ -99,6 +99,10 @@ export const LoginEndpointController = new RouterSet((router)=>{
         res.json(oResponse(true));
     });
 
+    router.get("/hash", async function (req, res) {
+        res.end( require("crypto").randomBytes(32).toString('hex') );
+    });
+
     return router;
 });
 

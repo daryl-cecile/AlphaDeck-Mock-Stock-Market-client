@@ -1,23 +1,15 @@
 import {BaseService} from "./BaseService";
 import {System} from "../config/System";
 import {isNullOrUndefined} from "../config/convenienceHelpers";
+import {CurrencyInfoModel} from "../models/CurrencyInfoModel";
+import {CurrencyInfoRepository} from "../Repository/CurrencyInfoRepository";
 
 let superAgent = require("superagent");
 
 class service extends BaseService{
 
-    private currencyList:{[currency:string]:{ fromOneUSD?:number, name?:string }} = {};
-    private currencyInfo:{
-        [currencyCode:string]:{
-            symbol : string,
-            name: string,
-            symbol_native : string,
-            decimal_digits : number,
-            rounding : number,
-            code : string,
-            name_plural : string
-        }
-    } = {};
+    private _currencyList:{[currency:string]:{ fromOneUSD?:number, name?:string }} = {};
+
 
     constructor() {
         super();
@@ -31,8 +23,15 @@ class service extends BaseService{
         }).end((err, res) => {
             for (let k in res.body){
                 if (res.body.hasOwnProperty(k)){
-                    if (isNullOrUndefined(this.currencyList[k])) this.currencyList[k] = {};
-                    this.currencyList[k].name = res.body[k];
+
+                    if (isNullOrUndefined(this._currencyList[k])) this._currencyList[k] = {};
+                    this._currencyList[k].name = res.body[k];
+
+                    if (k === "MXN"){
+                        if (isNullOrUndefined(this._currencyList["MXP"])) this._currencyList["MXP"] = {};
+                        this._currencyList["MXP"].name = res.body[k];
+                    }
+
                 }
             }
         });
@@ -44,39 +43,60 @@ class service extends BaseService{
             if (!err){
                 for (let k in res.body.rates){
                     if (res.body.rates.hasOwnProperty(k)){
-                        if (isNullOrUndefined(this.currencyList[k])) this.currencyList[k] = {};
-                        this.currencyList[k].fromOneUSD = res.body.rates[k];
+                        if (isNullOrUndefined(this._currencyList[k])) this._currencyList[k] = {};
+                        this._currencyList[k].fromOneUSD = res.body.rates[k];
+
+                        if (k === "MXN"){
+                            if (isNullOrUndefined(this._currencyList["MXP"])) this._currencyList["MXP"] = {};
+                            this._currencyList["MXP"].fromOneUSD = res.body.rates[k] * 1000;
+                        }
+
                     }
                 }
             }
         });
 
-        superAgent.get("https://gist.githubusercontent.com/soubhikchatterjee/7972a069d478acd891c9ab27b87a87e2/raw/44c7f50435402d0b0ba3d14e7fd9ca5eb5a0de70/Country%2520Currency%2520Codes%2520JSON").end( (err, res)=>{
-            this.currencyInfo = JSON.parse( res.text )[0];
-        });
+    }
 
+    async getCurrencyInfoOf(currencyCode:string){
+        if (this._currencyList[currencyCode]) return this._currencyList[currencyCode];
+
+        let currencyInfo = await CurrencyInfoRepository.getByCode(currencyCode);
+        let correctCurrency = await CurrencyInfoRepository.getByName(currencyInfo.name);
+        currencyCode = correctCurrency.code;
+
+        return this._currencyList[currencyCode];
+    }
+
+    async get1USDRate(to:string){
+        return 1 / (await this.getCurrencyInfoOf(to)).fromOneUSD;
     }
 
     async convert(from:string,to:string, fromValue:number=1){
-        return new Promise<number>( resolve => {
-
-            if (from === "USD"){
-                resolve( this.currencyList[to].fromOneUSD * fromValue );
-            }
-            else{
-                let rate = 1 / this.currencyList[from].fromOneUSD; // get to USD from 'from'
-                let base = fromValue * rate;
-                let value = this.currencyList[to].fromOneUSD * base;
-
-                resolve( value );
-            }
-
-        });
+        if (from === "USD"){
+            return (await this.getCurrencyInfoOf(to)).fromOneUSD * fromValue;
+        }
+        else{
+            let rate = 1 / (await this.getCurrencyInfoOf(from)).fromOneUSD; // get to USD from 'from'
+            let base = fromValue * rate;
+            return (await this.getCurrencyInfoOf(to)).fromOneUSD * base;
+        }
 
     }
 
-    formatCurrency(value:number, currency:string){
-        let cur = this.currencyInfo[currency.toUpperCase()];
+    async getSign(currency:string){
+        let cur = await CurrencyInfoRepository.getByCode(currency);
+
+        if (isNullOrUndefined(cur)){
+            return "?";
+        }
+        else{
+            return cur.symbol;
+        }
+    }
+
+    async formatCurrency(value:number, currency:string){
+        let cur = await CurrencyInfoRepository.getByCode(currency);
 
         if (isNullOrUndefined(cur)){
             return {

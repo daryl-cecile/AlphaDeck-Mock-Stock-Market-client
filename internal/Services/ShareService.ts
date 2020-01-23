@@ -30,6 +30,23 @@ class service extends BaseService{
 
     }
 
+    public async listShares(owner:UserModel, symbol:string=""):Promise<ShareModel[]>{
+        await System.log("Task",`listShares - symbol: ${symbol}`);
+
+        if (isNullOrUndefined(owner)) return [];
+
+        let allOwnedShares:ShareModel[] = await SharesRepository.findByUser(owner);
+        let finalResults:ShareModel[] = [];
+
+        for (let share of allOwnedShares){
+            if ( share.stockInfo.symbol === symbol ){
+                finalResults.push(share);
+            }
+        }
+
+        return finalResults;
+    }
+
     public async singleBySymbol(owner:UserModel, symbol:string=""):Promise<ShareModel>{
         await System.log("Task",`singleBySymbol - term: ${symbol}`);
 
@@ -44,6 +61,12 @@ class service extends BaseService{
         }
         return undefined;
 
+    }
+
+    public async singleByIdentifier(identifier:string=""):Promise<ShareModel>{
+        await System.log("Task",`singleByIdentifier - identifier: ${identifier}`);
+
+        return await SharesRepository.findByIdentifier(identifier);
     }
 
 }

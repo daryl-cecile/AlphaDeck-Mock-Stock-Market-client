@@ -9,6 +9,22 @@ class repo extends BaseRepository<OptionModel>{
         super(OptionModel);
     }
 
+    async getOptions(labels:string[], honourableOnly:boolean=true){
+        let items = (await this.repo.find({
+            where: labels.map(l => {
+                return { label : l }
+            })
+        }));
+
+        if (honourableOnly){
+            items = items.filter(item => {
+                return item.isHonourable === true;
+            });
+        }
+
+        return items;
+    }
+
     async getOption(label:string, honourableOnly:boolean=true){
         let item = (await this.repo.findOne({
             where: {

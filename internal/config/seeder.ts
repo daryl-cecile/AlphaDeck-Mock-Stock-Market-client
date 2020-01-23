@@ -4,9 +4,15 @@ import {UserRepository} from "../Repository/UserRepository";
 import {StockService} from "../Services/StockService";
 import {System} from "./System";
 import {TransactionService} from "../Services/TransactionService";
+import {CurrencyInfoModel} from "../models/CurrencyInfoModel";
+import {CurrencyInfoRepository} from "../Repository/CurrencyInfoRepository";
+import {JsonObject} from "./convenienceHelpers";
 
+let superAgent = require("superagent");
 
 (async function(){
+
+    let seedCache = {};
 
     async function seedShares(){
         let googleStock = await StockService.getStock("GOOGL");
@@ -89,12 +95,41 @@ import {TransactionService} from "../Services/TransactionService";
         return existingUser;
     }
 
+    async function seedCurrency(code:string, prop:JsonObject){
+        if (!seedCache['currency']){
+            seedCache['currency'] = await CurrencyInfoRepository.getAll();
+        }
+
+        let matches = seedCache['currency'].filter(k => {
+            return k.code === code;
+        });
+        let existingCurrencyInfo = matches?.[0];
+        if (existingCurrencyInfo === undefined ){
+            let c = new CurrencyInfoModel();
+            Object.keys(prop).forEach(k => {
+                c[k] = prop[k];
+            });
+            return await CurrencyInfoRepository.save(c);
+        }
+        return existingCurrencyInfo;
+    }
+
     let baseUser = await seedUser("Test User","testUser1","test123");
     let rootUser = await seedUser("Admin User","root","admin", true);
 
     // await seedStocks();
 
     // await seedShares();
+
+    // superAgent.get("https://gist.githubusercontent.com/soubhikchatterjee/7972a069d478acd891c9ab27b87a87e2/raw/44c7f50435402d0b0ba3d14e7fd9ca5eb5a0de70/Country%2520Currency%2520Codes%2520JSON").end(async (err, res) => {
+    //     try{
+    //         let val:CurrencyInfoModel[] = JSON.parse(res.text)[0];
+    //         for (const v of Object.values(val)) {
+    //             await seedCurrency(v.code, v);
+    //         }
+    //     }
+    //     catch(e){ /* noop */ }
+    // });
 
     await System.log("Seed","SEEDING COMPLETE", System.ERRORS.NORMAL);
 

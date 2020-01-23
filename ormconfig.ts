@@ -6,6 +6,7 @@ import {SystemLogEntryModel} from "./internal/models/SystemLogEntryModel";
 import {TransactionLogModel} from "./internal/models/TransactionLogModel";
 import {ApiCacheModel} from "./internal/models/ApiCacheModel";
 import {OptionModel} from "./internal/models/OptionModel";
+import {CurrencyInfoModel} from "./internal/models/CurrencyInfoModel";
 
 interface IConnectionInfo{
     type: string,
@@ -44,7 +45,8 @@ let x:IConnectionInfo = {
         SystemLogEntryModel,
         TransactionLogModel,
         ApiCacheModel,
-        OptionModel
+        OptionModel,
+        CurrencyInfoModel
     ],
     migrationsTableName:'db_migrations',
     migrations: ["orm_migrations/*.js"],

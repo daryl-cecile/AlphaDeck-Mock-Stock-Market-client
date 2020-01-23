@@ -15,6 +15,9 @@ export class ShareModel extends BaseModel{
     @Column("decimal", { precision: 16, scale: 4 })
     public boughtAtPrice:number;
 
+    @Column("varchar", {length: 255, unique: true})
+    public identifier:string;
+
     @ManyToOne(type => UserModel, user => user.ownedShares)
     @JoinColumn()
     public owner:UserModel;

@@ -4,6 +4,16 @@
     <%- include('../partials/meta') %>
     <title>Transaction - AlphaDeck</title>
     <%- include('../partials/imports') %>
+
+
+
+    <script>
+        const INTENT = '<%=intent%>';
+        const SYMBOL = '<%=symbol%>';
+        const HASH = '<%=identifier%>';
+    </script>
+
+    <script src="/public/scripts/page_transaction.js"></script>
 </head>
 <body>
 <%- include('../partials/nav') %>
@@ -12,9 +22,13 @@
 
     <%- include('../partials/aside',{user}) %>
 
-    <section class="d-block">
+    <section class="d-block scrollable">
         <div class="subnav">
-            <h4>Transaction: <%=intent%> shares for <%=symbol%></h4>
+            <% if (intent === "BUY"){ %>
+                <h4>Confirm Stock purchase: <%=symbol%></h4>
+            <% } else { %>
+                <h4>Transaction: <%=symbol%> sale</h4>
+            <% } %>
         </div>
 
         <% if (intent === "BUY"){ %>
@@ -26,62 +40,6 @@
     </section>
 
 </main>
-
-<script>
-    const INTENT = '<%=intent%>';
-    const SYMBOL = '<%=symbol%>';
-    let loadingIndicator = Tools.showLoading();
-
-    function checkCanSell(callback){
-        AlphaDeck.getOwnedShareInfo(SYMBOL, (r)=>{
-            if (r.isSuccessful){
-                if (Object.keys(r.payload).length > 0){
-                    loadingIndicator.stop();
-                    if (callback) callback(r.payload);
-                }
-                else{
-                    Tools.showAlert("No shares", "You do not currently own any shares in " + SYMBOL + " to sell.",()=>{
-                        history.back();
-                    });
-                }
-            }
-            else{
-                Tools.showAlert("Unknown error", "We were unable to prepare this transaction. Please try again",()=>{
-                    location.reload();
-                });
-            }
-        });
-    }
-
-    function checkCanBuy(callback){
-        AlphaDeck.getSingleStock(SYMBOL,(r)=>{
-            if (r.isSuccessful){
-                if (Object.keys(r.payload).length > 0){
-                    loadingIndicator.stop();
-                    if (callback) callback(r.payload);
-                }
-                else{
-                    Tools.showAlert("Stock not found", "This stock is either no longer available for trading.",()=>{
-                        history.back();
-                    });
-                }
-            }
-            else{
-                Tools.showAlert("Unknown error", "We were unable to get any information about this stock. Please try again shortly",()=>{
-                    location.reload();
-                });
-            }
-        });
-    }
-
-    if (INTENT === "SELL"){
-        checkCanSell();
-    }
-    else{
-        checkCanBuy();
-    }
-
-</script>
 
 <%- include('../partials/footer') %>
 </body>

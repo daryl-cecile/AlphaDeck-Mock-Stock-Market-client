@@ -22,6 +22,9 @@ export class TransactionLogModel extends BaseModel{
     @Column("decimal", { precision: 16, scale: 4 })
     public atPrice:number;
 
+    @Column("decimal", { precision: 16, scale: 4, default: "0.0000" })
+    public charges:number;
+
     @Column("varchar")
     public reference:string;
 

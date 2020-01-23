@@ -157,6 +157,10 @@ export namespace Passport{
 
     }
 
+    export async function createHash64(){
+        return require("crypto").randomBytes(32).toString('hex');
+    }
+
 }
 
 module.exports.default = Passport; // for tests

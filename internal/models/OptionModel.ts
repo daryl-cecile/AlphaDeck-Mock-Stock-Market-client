@@ -4,7 +4,8 @@ import {isNullOrUndefined} from "../config/convenienceHelpers";
 
 export enum OptionType{
     STRING,
-    BOOLEAN
+    BOOLEAN,
+    NUMBER
 }
 
 @Entity("core_options")

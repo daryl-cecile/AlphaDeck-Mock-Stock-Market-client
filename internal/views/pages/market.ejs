@@ -21,7 +21,7 @@
             </div>
         </div>
 
-        <div class="grid-x3 withShadow" id="results"></div>
+        <div class="grid x3col withShadow" id="results"></div>
     </section>
 
 </main>
@@ -38,11 +38,16 @@
         let loader = Tools.ButtonStateSwapper(elem);
         if (elem) loader.setLoading();
 
-        AlphaDeck.getOwnedShareInfo(symbol, (r)=>{
+        AlphaDeck.getAllOwnedShareInfoBySymbol(symbol, (r)=>{
             if (elem) loader.reset();
             if (r.isSuccessful){
-                if (Object.keys(r.payload).length > 0){
-                    location.href = "/transaction?intent=SELL&symbol=" + symbol;
+                if (r.payload.length === 1){
+                    location.href = "/transaction?intent=SELL&hash=" + r.payload[0].identifier;
+                }
+                else if (r.payload.length > 1){
+                    Tools.showAlert("Multiple sets found", "You have multiple sets of shares for this stock available. Please choose the one you want to sell from your share list",()=>{
+                        location.href = "/home";
+                    });
                 }
                 else{
                     Tools.showAlert("No shares to sell", "You do not currently own any shares for this stock to sell.");
@@ -60,7 +65,7 @@
                         <div class="stock-mini-info">
                             <h5>${info.symbol}</h5>
                             <p>${info.company}</p>
-                            <span>Valued at ${ info.currency } ${ info.price } per share</span>
+                            <span>${ info.currency } ${ info.price } &times; ${info.volume}</span>
                         </div>
                         <div class="btn-options">
                             <button onclick="buy('${info.symbol}', this)" class="${info.volume === 0 ? '' : 'primary'}">BUY</button>

@@ -8,10 +8,10 @@ class repo extends BaseRepository<ShareModel>{
         super(ShareModel);
     }
 
-    async findById(id:number){
+    async findByIdentifier(hash:string){
         return await this.repo.findOne({
             where : {
-                id : id
+                identifier : hash
             },
             relations: ['stockInfo','owner']
         })

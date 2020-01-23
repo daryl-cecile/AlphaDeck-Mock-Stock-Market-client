@@ -1,20 +1,57 @@
-<div class="grid-x3">
+<div class="grid x3col">
 
-    <label class="input">
+    <label class="input no-push-bottom">
+        <span>Local Currency:</span>
+        <input type="text" id="local-currency" class="no-border" readonly value="USD">
+    </label>
+
+    <label class="input no-push-bottom">
         <span>Vendor:</span>
-        <input type="text" readonly value="AlphaDeck">
+        <input type="text" class="no-border" readonly value="AlphaDeck">
     </label>
 
-    <label class="input">
-        <span>Date:</span>
-        <input type="text" readonly value="<%= (new Date()).toDateString() %>">
-    </label>
-
-    <label class="input">
-        <span>Reference:</span>
-        <input type="text" readonly value="-">
+    <label class="input no-push-bottom">
+        <span>Stock Currency:</span>
+        <input type="text" id="stock-currency" class="no-border" readonly value="USD">
     </label>
 
 </div>
 
 <hr class="mini">
+
+<br>
+
+<div class="transaction-card">
+
+    <h4 class="quiet">Transaction summary</h4>
+
+    <div class="order">
+
+        <label class="o-item s">
+            <span class="o-key">Initial Value (per share):</span>
+            <span class="o-val"><ins itemid="local-currency"></ins> <ins itemid="initial-value"></ins></span>
+        </label>
+
+        <label class="o-item s">
+            <span class="o-key">Current Value (per share):</span>
+            <span class="o-val"> <ins itemid="local-currency"></ins> <ins itemid="current-value"></ins> </span>
+        </label>
+
+        <hr>
+
+       <label class="o-item">
+            <span class="o-key">Total Profit:</span>
+            <span class="o-val"><ins itemid="local-currency"></ins> <ins itemid="profit"></ins></span>
+        </label>
+
+        <br>
+
+        <button class="primary filled" onclick="sell(this)">SELL</button>
+
+    </div>
+
+</div>
+
+<br>
+
+<script src="/public/scripts/page_sell_stock.js"></script>
