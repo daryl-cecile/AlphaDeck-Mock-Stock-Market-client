@@ -145,6 +145,10 @@ export const SharesEndpointController = new RouterSet( (router) => {
     });
 
 
+    router.post("/transaction/begin", async function(req, res){
+        // create lock table to lock transactions for x minutes
+    });
+
     router.post("/transaction/make", async function(req, res){
 
         let sessionKey = req.header("sessionKey");
