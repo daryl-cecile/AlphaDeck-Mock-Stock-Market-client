@@ -31,7 +31,6 @@ function onDataReady() {
     $('[itemid="current-value"]').html( roundCurrency(currentValue) );
     $('[itemid="initial-value"]').html( roundCurrency(initialValue) );
     $('[itemid="profit"]').html( roundCurrency(currentValue - initialValue) );
-    $('#company-name').val(info.share.stockInfo.company);
 
     loadingIndicator.stop();
 }

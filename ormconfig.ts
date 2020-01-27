@@ -7,7 +7,6 @@ import {TransactionLogModel} from "./internal/models/TransactionLogModel";
 import {ApiCacheModel} from "./internal/models/ApiCacheModel";
 import {OptionModel} from "./internal/models/OptionModel";
 import {CurrencyInfoModel} from "./internal/models/CurrencyInfoModel";
-import {ReservedShareModel} from "./internal/models/ReservedShareModel";
 
 interface IConnectionInfo{
     type: string,
@@ -47,8 +46,7 @@ let x:IConnectionInfo = {
         TransactionLogModel,
         ApiCacheModel,
         OptionModel,
-        CurrencyInfoModel,
-        ReservedShareModel
+        CurrencyInfoModel
     ],
     migrationsTableName:'db_migrations',
     migrations: ["orm_migrations/*.js"],

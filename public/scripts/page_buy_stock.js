@@ -13,7 +13,6 @@ let $balanceAfterPurchase = $('#post-balance');
 let $charges = $('[itemid="charge-per-share"]');
 let $quantity = $('#share-quantity');
 let $total = $('[itemid="total-price"]');
-let $buyBtn = $('#purchase-btn');
 
 let values = {
     balancePostPurchase: 0,
@@ -84,18 +83,7 @@ function updateTotal(){
 
     $total.html( roundCurrency(grandTotal) );
 
-    let accBalanceAfter = parseFloat(info.account.credit) - grandTotal;
-
-    $balanceAfterPurchase.val( values.localCurrency + ' ' + roundCurrency(accBalanceAfter) );
-
-    if (accBalanceAfter < 0){
-        $balanceAfterPurchase.css({ color: 'red' });
-        $buyBtn.attr('disabled','disabled');
-    }
-    else{
-        $balanceAfterPurchase.css({ color: 'initial' });
-        $buyBtn.removeAttr('disabled');
-    }
+    $balanceAfterPurchase.val( values.localCurrency + ' ' + roundCurrency(parseFloat(info.account.credit) - grandTotal) );
 
     values.balancePostPurchase = parseFloat(info.account.credit) - grandTotal;
     values.total = grandTotal;

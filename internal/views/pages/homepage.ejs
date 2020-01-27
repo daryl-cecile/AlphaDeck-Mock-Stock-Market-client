@@ -24,44 +24,11 @@
             </div>
             <div class="result">
 
-                <% function roundCurrency(num){
-                    num = parseFloat(num);
-                    let val = (Math.round( ( num + Number.EPSILON ) * 100 ) / 100).toString();
-                    let whole = val.indexOf(".") > -1 ? val.split(".")[0] : val;
-                    let part = val.indexOf(".") > -1 ? val.split(".")[1] : "00";
-                    return whole + "." + part.padEnd(2,"0");
-                }
-
-                function relativeDay(date){
-                    let daysElapsed = Math.round((Date.now() - date.getTime())/(24*60*60*1000));
-                    if (daysElapsed === 0){
-                        return 'Today';
-                    }
-                    else if (daysElapsed === 1) {
-                        return daysElapsed + ' day ago';
-                    }
-                    else{
-                        return daysElapsed + ' days ago';
-                    }
-                }%>
-
                 <% for (let n of shares){ %>
                     <div class="item">
                         <h5><%= n.stockInfo.symbol %></h5>
                         <p><%= n.stockInfo.company %></p>
-                        <span style="text-align: right">
-                            <date title="Last Updated"><%= relativeDay(n.stockInfo.updatedAt) %></date> <br>
-                            <%= roundCurrency(100-((parseFloat(n.boughtAtPrice)/n.stockInfo.price)*100)) %>%
-                        </span>
-                        <input type="hidden" name="initial_value" value="<%= n.boughtAtPrice %>">
-                        <input type="hidden" name="current_value" value="<%= n.stockInfo.price %>">
-                        <input type="hidden" name="value_difference" value="<%= n.stockInfo.price - parseFloat(n.boughtAtPrice) %>">
-                        <input type="hidden" name="profit_loss_percent" value="<%= roundCurrency(100-((parseFloat(n.boughtAtPrice)/n.stockInfo.price)*100)) %>">
-                        <input type="hidden" name="company_name" value="<%= n.stockInfo.company %>">
-                        <input type="hidden" name="symbol" value="<%= n.stockInfo.symbol %>">
-                        <input type="hidden" name="volume_remaining" value="<%= n.stockInfo.volume %>">
-                        <input type="hidden" name="hash" value="<%= n.identifier %>">
-                        <input type="hidden" name="currency" value="<%= n.currency %>">
+                        <span>B: <%= n.boughtAtPrice %>, C: <%= n.stockInfo.price %></span>
                     </div>
                 <% } %>
 
@@ -77,98 +44,14 @@
 </main>
 
 <script>
-    let defaultPreviewContent = null;
-    let $preview = $('.preview');
-
     Tools.onReady(()=>{
         let $col = $('.result .item');
 
         $col.on('click',function(){
             $col.removeClass("selected");
             $(this).addClass("selected");
-
-            setPreview({
-                initialValue: $(this).find('[name="initial_value"]').val(),
-                currentValue: $(this).find('[name="current_value"]').val(),
-                valueDifference: $(this).find('[name="value_difference"]').val(),
-                profitAndLoss: $(this).find('[name="profit_loss_percent"]').val(),
-                companyName: $(this).find('[name="company_name"]').val(),
-                symbol: $(this).find('[name="symbol"]').val(),
-                volumeRemaining: $(this).find('[name="volume_remaining"]').val(),
-                hash: $(this).find('[name="hash"]').val(),
-                currency: $(this).find('[name="currency"]').val(),
-            });
         });
-
-        $('[name="stock-search-term"]').on('input',function(){
-            let v = $(this).val().toLowerCase();
-            $col.removeClass('hidden');
-            $col.each((i,e) =>{
-                let $e = $(e);
-                if ( $e.find('h5').text().toLowerCase().indexOf(v) === -1 && $e.find('p').text().toLowerCase().indexOf(v) === -1 ){
-                    $e.addClass('hidden');
-                }
-            });
-        });
-
-        defaultPreviewContent = $preview.html();
-    });
-
-    function setPreview(info){
-        $preview.empty();
-
-        let lossMessage = `<p class='t-mid'>`;
-        lossMessage += `If you sell now, you will be accepting a loss of ${info.profitAndLoss}%`;
-        if (parseFloat(info.profitAndLoss) < -3){
-            lossMessage += '. We recommend you sell now.'
-        }
-        else{
-            lossMessage += '. We recommend you hold on to this share a bit longer'
-        }
-        lossMessage += `</p>`;
-
-        $preview.html(`
-            <h1>${info.companyName}</h1>
-            <br>
-            <div class="transaction-card">
-                <h4 class="quiet">${info.symbol} Stats</h4>
-                <div class="order">
-                    <label class="o-item s">
-                        <span class="o-key">Initial Value (per share):</span>
-                        <span class="o-val">${info.currency} ${info.initialValue}</span>
-                    </label>
-
-                    <label class="o-item s">
-                        <span class="o-key">Current Value (per share):</span>
-                        <span class="o-val">${info.currency} ${info.currentValue}</span>
-                    </label>
-
-                    <label class="o-item s">
-                        <span class="o-key">Volumes remaining in market:</span>
-                        <span class="o-val">${info.volumeRemaining}</span>
-                    </label>
-
-                    <hr>
-
-                   <label class="o-item">
-                        <span class="o-key">Total ${parseFloat(info.valueDifference) > 0 ? 'Profit' : 'Loss'}:</span>
-                        <span class="o-val">${info.currency} ${Tools.roundCurrency(info.valueDifference)}</span>
-                    </label>
-
-                    ${ parseFloat(info.valueDifference) < 0 ? lossMessage : '' }
-
-                    <hr>
-
-                    <br>
-                    <button class="primary filled" onclick="goToSell('${info.hash}')">MAKE SALE</button>
-                </div>
-            </div>
-        `);
-    }
-
-    function goToSell(hash){
-        window.location.assign("/transaction?intent=SELL&hash=" + hash);
-    }
+    })
 </script>
 
 <%- include('../partials/footer') %>
