@@ -135,6 +135,14 @@ namespace Tools{
         }
     }
 
+    export function roundCurrency(num){
+        num = parseFloat(num);
+        let val = (Math.round( ( num + Number.EPSILON ) * 100 ) / 100).toString();
+        let whole = val.indexOf(".") > -1 ? val.split(".")[0] : val;
+        let part = val.indexOf(".") > -1 ? val.split(".")[1] : "00";
+        return whole + "." + part.padEnd(2,"0");
+    }
+
     export function loadScript(attr:scriptTagAttributes, callback:any){
         let scriptTag = document.createElement("script");
         scriptTag.src = attr.src;
