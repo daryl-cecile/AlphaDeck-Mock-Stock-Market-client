@@ -140,6 +140,7 @@ section{
 			.item{
 				position: relative;
 				padding: 15px;
+				transition: all .1s;
 
 				h5{
 					margin: 0;
@@ -168,6 +169,14 @@ section{
 				&.selected{
 					background: @primary-btn-color;
 					color: @select-color;
+				}
+
+				&.hidden{
+					pointer-events: none;
+					height: 0;
+					opacity:0;
+					padding: 0 15px;
+					overflow: hidden;
 				}
 
 			}

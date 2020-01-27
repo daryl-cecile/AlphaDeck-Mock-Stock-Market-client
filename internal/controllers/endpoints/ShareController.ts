@@ -5,6 +5,9 @@ import {SharesService} from "../../Services/ShareService";
 import {Passport} from "../../Services/Passport";
 import {isNullOrUndefined} from "../../config/convenienceHelpers";
 import {TransactionService} from "../../Services/TransactionService";
+import {ReservedShareModel} from "../../models/ReservedShareModel";
+import {StockRepository} from "../../Repository/StockRepository";
+import {ReservedSharesRepository} from "../../Repository/ReservedSharesRepository";
 
 export const SharesEndpointController = new RouterSet( (router) => {
 
@@ -23,12 +26,27 @@ export const SharesEndpointController = new RouterSet( (router) => {
 
     router.get("/stock/single", async function(req, res){
         let symbol = req.query['symbol'];
+        let sessionKey = req.header("sessionKey");
+        let acc = await Passport.getCurrentUserFromSession(sessionKey);
 
         let uncachedResult = undefined;
 
         try{
             uncachedResult = await StockService.getStock(symbol, true);
             let result = await StockService.getStock(symbol, false);
+
+            let quantityToReserve = 0;
+            let reserves = await ReservedSharesRepository.getAll();
+
+            for (let reserve of reserves){
+                if (reserve.stockInfo.symbol === symbol && reserve.owner.id !==  acc?.id){
+                    if (reserve.IsValid) quantityToReserve += reserve.quantity;
+                }
+            }
+
+            result.volume -= quantityToReserve;
+            if (result.volume < 0) result.volume = 0;
+
             res.json( oResponse(true, "Success", result) );
         }
         catch(x){
@@ -145,8 +163,28 @@ export const SharesEndpointController = new RouterSet( (router) => {
     });
 
 
-    router.post("/transaction/begin", async function(req, res){
-        // create lock table to lock transactions for x minutes
+    router.post("/transaction/reserve", async function(req, res){
+
+        let sessionKey = req.header("sessionKey");
+        let symbol = req.body['symbol'];
+        let quantity = req.body['quantity'];
+        let acc = await Passport.getCurrentUserFromSession(sessionKey);
+
+        if ( isNullOrUndefined(acc) ){
+            res.json( oResponse(false, 'Not Authenticated', 'You are not logged in. Please log in and try again') );
+        }
+        else {
+
+            let reserve = new ReservedShareModel();
+            reserve.owner = acc;
+            reserve.quantity = quantity;
+            reserve.stockInfo = await StockRepository.findBySymbol(symbol);
+            await ReservedSharesRepository.update(reserve);
+
+            res.json( oResponse(true, `Success`,'Reserved ${quantity} shares for ${symbol}') );
+
+        }
+
     });
 
     router.post("/transaction/make", async function(req, res){
