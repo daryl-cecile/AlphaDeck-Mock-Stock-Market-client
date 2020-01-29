@@ -11,7 +11,7 @@ export const LoginEndpointController = new RouterSet((router)=>{
         let username = req.body['username'];    // set using form data
         let password = req.body['password'];    // set using form data
 
-        let result = await Passport.authenticate(username, password, req, res);
+        let result = await Passport.authenticate(username, password);
 
         res. json( result.object );
         res.end();

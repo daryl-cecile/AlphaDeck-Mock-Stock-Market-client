@@ -47,6 +47,9 @@ class service extends BaseService{
             await TransactionLogRepository.save(log);
             await UserRepository.update(buyer);
         }
+        else{
+            throw new AppError("Transaction failed due to invalid quantity");
+        }
     }
 
     async getExpenses(sharePrice:number, quantity:number=1){

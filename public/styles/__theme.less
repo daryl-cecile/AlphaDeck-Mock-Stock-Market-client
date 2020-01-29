@@ -187,6 +187,30 @@ input[type="number"]{
 
 }
 
+input[type="checkbox"]{
+	border-radius: @general-rounded-border;
+	border: 2px solid transparent;
+	background: @light-border-color;
+	-webkit-appearance: none;
+	display: inline-block;
+	position: relative;
+	width: calc(1.2em + 2px);
+	height: calc(1.2em + 2px);
+	white-space: nowrap;
+	vertical-align: text-top;
+	margin:0;
+
+	&:checked{
+		background: @select-background;
+	}
+
+	&:focus{
+		border-color: @primary-btn-color;
+		outline: none;
+	}
+
+}
+
 span{
 	&.hint{
 		font-style: italic;

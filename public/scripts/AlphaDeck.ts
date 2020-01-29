@@ -1,11 +1,33 @@
+function isNullOrUndefined(obj:any){
+    if (obj === void 0) return true;
+    return obj === null;
+
+}
 
 namespace AlphaDeck{
 
-    export function findStock(terms:string, callback){
+    export function findStock(terms: string, callback)
+    export function findStock(terms: string, filters: any, callback)
+    export function findStock(terms:string, callbackOrFilters, callback?){
+
+        let filterString = "";
+
+        if ( isNullOrUndefined(callback) ){
+            callback = callbackOrFilters;
+        }
+        else{
+            Object.keys(callbackOrFilters).forEach(name => {
+                filterString += '&' + name + '=' +  encodeURIComponent(callbackOrFilters[name])
+            });
+        }
+
         $.ajax({
-            url: `/api/stock/query?term=${encodeURIComponent(terms)}`,
+            url: `/api/stock/query?term=${encodeURIComponent(terms)}${filterString}`,
             headers:{
-                "X-CSRF-TOKEN" : Tools.csrfToken()
+                "sessionKey" : Tools.sessionKey()
+            },
+            xhrFields:{
+                withCredentials: true
             }
         }).then(r => {
             callback(r);

@@ -3,7 +3,7 @@ import {StockResponseError, StockService} from "../../Services/StockService";
 import {oResponse} from "../../config/JSONResponse";
 import {SharesService} from "../../Services/ShareService";
 import {Passport} from "../../Services/Passport";
-import {isNullOrUndefined} from "../../config/convenienceHelpers";
+import {isNullOrUndefined, isVoid} from "../../config/convenienceHelpers";
 import {TransactionService} from "../../Services/TransactionService";
 import {ReservedShareModel} from "../../models/ReservedShareModel";
 import {StockRepository} from "../../Repository/StockRepository";
@@ -13,9 +13,27 @@ export const SharesEndpointController = new RouterSet( (router) => {
 
     router.get("/stock/query", async function(req, res){
         let query = req.query['term'];
+        let filters = {
+            nativeCurrencyOnly: ( isVoid(req.query['nativeCurrency']) ? false : Boolean(req.query['nativeCurrency'])),
+            availableOnly: ( isVoid(req.query['availableOnly']) ? false : Boolean(req.query['availableOnly']))
+        };
+        let sessionKey = req.header("sessionKey");
+        let user = await Passport.getCurrentUserFromSession( sessionKey );
 
         try{
             let result = await StockService.queryStock(query);
+
+            if (filters.nativeCurrencyOnly === true){
+                result = result.filter(stock => {
+                    return stock.currency === user.creditCurrency
+                });
+            }
+
+            if (filters.availableOnly === true){
+                result = result.filter(stock => {
+                    return stock.volume > 0
+                });
+            }
 
             res.json( oResponse(true, "Success", result) )
         }

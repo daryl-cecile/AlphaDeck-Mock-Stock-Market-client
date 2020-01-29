@@ -67,8 +67,9 @@ function updateTotal(){
     const MAX_TAX_CAP = parseFloat(info.settings['MAX_TAX_CAP'].value);
     const TAX_PERCENT = parseFloat(info.settings['TAX_PERCENT'].value);
 
+    let quantity = parseInt( $quantity.val() || "1" );
     let sharePrice = info.stock.price * info.rate.rate;
-    let shareSetPrice = sharePrice * parseInt( $quantity.val() || "1" );
+    let shareSetPrice = sharePrice * quantity;
 
     let taxRate = TAX_PERCENT/100;
 
@@ -90,6 +91,10 @@ function updateTotal(){
 
     if (accBalanceAfter < 0){
         $balanceAfterPurchase.css({ color: 'red' });
+        $buyBtn.attr('disabled','disabled');
+    }
+    else if (quantity < 1){
+        $balanceAfterPurchase.css({ color: 'initial' });
         $buyBtn.attr('disabled','disabled');
     }
     else{

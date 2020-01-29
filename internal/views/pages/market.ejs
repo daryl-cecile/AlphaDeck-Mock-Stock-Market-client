@@ -15,10 +15,19 @@
     <section class="no-padd column">
 
         <div class="center-search-input">
+            <div>
+                <span id="filter-options">
+                    <label><input type="checkbox" id="opt-avOnly"> Available Only</label>
+                    <label><input type="checkbox" id="opt-nativeCurrencyOnly"> Local currency Only</label>
+                </span>
+            </div>
+
             <div class="search">
                 <input type="search" name="stock-search-term" id="finder" title="Find stocks" placeholder="Find stocks by name or symbol">
                 <%- include('../partials/search_svg') %>
             </div>
+
+            <div></div>
         </div>
 
         <div class="grid x3col withShadow" id="results"></div>
@@ -79,6 +88,8 @@
     Tools.onReady(()=>{
 
         let $result = $('#results');
+        let $avOnlyCheckbox = $('#opt-avOnly');
+        let $nativeCurrencyCheckbox = $('#opt-nativeCurrencyOnly');
 
         $("#finder").on("keypress",function(e){
             let self = this;
@@ -86,7 +97,12 @@
                 $(self).prop("readonly","true");
                 let loader = Tools.showLoading(true);
 
-                AlphaDeck.findStock(self.value, (r)=>{
+                let filters = {
+                    availableOnly: $avOnlyCheckbox.is(':checked'),
+                    nativeCurrency: $nativeCurrencyCheckbox.is(':checked')
+                };
+
+                AlphaDeck.findStock(self.value,filters, (r)=>{
                     loader.stop();
                     $(self).prop("readonly","");
                     $result.empty().attr("first_use","nope");
@@ -100,6 +116,20 @@
                     }
                 });
 
+            }
+        });
+
+        let $filterOptions = $('#filter-options');
+
+        $('.center-search-input').on('mouseenter',function(){
+            $filterOptions.css({
+                opacity: 1
+            });
+        }).on('mouseleave', function(){
+            if ($avOnlyCheckbox.is(':checked') === false && $nativeCurrencyCheckbox.is(':checked') === false ){
+                $filterOptions.css({
+                    opacity: 0
+                });
             }
         });
 

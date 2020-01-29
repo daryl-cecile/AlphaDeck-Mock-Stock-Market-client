@@ -51,7 +51,7 @@ export namespace Passport{
         });
     }
 
-    export async function authenticate(username:string, password:string, req, res){
+    export async function authenticate(username:string, password:string){
 
         let result:JSONResp = await this.isStaffCredentialsValid(username,password);
 
