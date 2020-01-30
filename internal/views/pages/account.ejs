@@ -12,8 +12,45 @@
 
     <%- include('../partials/aside',{user}) %>
 
-    <section class="center no-padd">
-        <h1 class="quiet">ACCOUNT</h1>
+    <section class="d-block scrollable">
+        <div class="subnav">
+            <h4>ACCOUNT</h4>
+        </div>
+
+        <div class="grid x3col fix-padd">
+
+            <label class="input no-push-bottom">
+                <span>First Name:</span>
+                <input type="text" class="no-border" readonly value="<%= user.firstName %>">
+            </label>
+
+            <label class="input no-push-bottom">
+                <span>Last Name:</span>
+                <input type="text" class="no-border" readonly value="<%= user.lastName %>">
+            </label>
+
+            <label class="input no-push-bottom">
+                <span>Username:</span>
+                <input type="text" id="post-balance" class="no-border" readonly value="<%= user.username %>">
+            </label>
+
+            <label class="input no-push-bottom">
+                <span>Email Address:</span>
+                <input type="text" class="no-border" readonly value="<%= user.email %>">
+            </label>
+
+            <label class="input no-push-bottom">
+                <span>Account Currency:</span>
+                <input type="text" class="no-border" readonly value="<%= user.creditCurrency %>">
+            </label>
+
+            <label class="input no-push-bottom">
+                <span>Account Credits:</span>
+                <input type="text" id="stock-currency" class="no-border" readonly value="<%= user.credit %>">
+            </label>
+
+        </div>
+
     </section>
 
 </main>

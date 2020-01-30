@@ -17,7 +17,7 @@ namespace AlphaDeck{
         }
         else{
             Object.keys(callbackOrFilters).forEach(name => {
-                filterString += '&' + name + '=' +  encodeURIComponent(callbackOrFilters[name])
+                if (callbackOrFilters[name]) filterString += '&' + name + '=' +  encodeURIComponent(callbackOrFilters[name])
             });
         }
 
