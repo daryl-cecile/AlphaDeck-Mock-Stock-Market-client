@@ -19,7 +19,7 @@ export class UserModel extends BaseModel{
     @Column("varchar",{length:255, unique: true})
     public username:string;
 
-    @Column("decimal", { precision: 16, scale: 4, default:"50000.4900" })
+    @Column("decimal", { precision: 16, scale: 4, default:"5000.4900" })
     public credit:number;
 
     @Column("varchar", { length: 5 , default:"USD" })
