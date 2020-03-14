@@ -8,3 +8,5 @@ Module coursework for Service Centric and Cloud Computing
 ### Instruction for running
 - Once cloned/downloaded, open this folder in Terminal/CommandPrompt and run `npm run local`.
 - If issues arise when trying to run, do `npm run fix` then the command above
+
+- Alternatively, visit https://alphadeck.herokuapp.com/ and use test username `testUser1` with test password `test123`
